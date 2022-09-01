@@ -14,8 +14,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     final Store<AppState> store =
@@ -41,35 +39,6 @@ class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
-
-// @immutable
-// class AppState {
-//   const AppState({required this.todoItems});
-//   final Iterable<String> todoItems;
-// }
-//
-// @immutable
-// abstract class AppAction {
-//   const AppAction();
-// }
-//
-// @immutable
-// abstract class ItemAction extends AppAction {
-//   const ItemAction(this.item);
-//   final String item;
-// }
-//
-// @immutable
-// class AddItemAction extends ItemAction {
-//   const AddItemAction(String todoItem) : super(todoItem);
-// }
-//
-// @immutable
-// class DeleteItemAction extends ItemAction {
-//   const DeleteItemAction(String todoItem) : super(todoItem);
-// }
-//
-// Iterable<String> addItemReducer(Iterable<String> prevItems, AddItemAction action) => prevItems.followedBy([action.item]);
 
 class _MyHomePageState extends State<MyHomePage> {
   @override

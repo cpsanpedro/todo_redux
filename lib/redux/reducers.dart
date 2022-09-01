@@ -8,9 +8,7 @@ AppState appStateReducer(AppState state, action) {
 
 List<ToDoItem> itemReducer(List<ToDoItem> state, action) {
   if (action is AddItemAction) {
-    return []
-      ..addAll(state)
-      ..add(ToDoItem(id: action.id, title: action.item));
+    return [...state, ToDoItem(id: action.id, title: action.item)];
   }
 
   if (action is DeleteItemAction) {
