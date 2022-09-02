@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:todo_redux/view_model/view_model.dart';
 
-class TodoListWidget extends StatelessWidget {
+class TodoListWidget extends StatefulWidget {
   const TodoListWidget({required this.model, Key? key}) : super(key: key);
   final ToDoViewModel model;
 
   @override
+  State<TodoListWidget> createState() => _TodoListWidgetState();
+}
+
+class _TodoListWidgetState extends State<TodoListWidget> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListView(
-        children: model.items
+        children: widget.model.items
             .map((item) => Dismissible(
                 background: Container(
                     alignment: Alignment.centerRight,
@@ -19,7 +29,7 @@ class TodoListWidget extends StatelessWidget {
                     )),
                 key: Key(item.id.toString()),
                 onDismissed: (direction) {
-                  model.onDeleteItem(item);
+                  widget.model.onDeleteItem(item);
                 },
                 child: ListTile(title: Text(item.title))))
             .toList());

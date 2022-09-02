@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:redux_epics/redux_epics.dart';
 import 'package:todo_redux/model/model.dart';
+import 'package:todo_redux/redux/actions.dart';
 import 'package:todo_redux/redux/reducers.dart';
 
+import 'redux/middleware.dart';
 import 'view_model/view_model.dart';
 import 'widget/add_item.dart';
 import 'widget/todo_list.dart';
@@ -16,9 +19,9 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    final Store<AppState> store =
-        Store<AppState>(appStateReducer, initialState: AppState.init());
-
+    var epicMiddleware = EpicMiddleware(epic);
+    final Store<AppState> store = Store<AppState>(appStateReducer,
+        initialState: AppState.init(), middleware: [epicMiddleware]);
     return StoreProvider<AppState>(
       store: store,
       child: MaterialApp(
@@ -26,15 +29,20 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const MyHomePage(title: 'To-Do List'),
+        home: StoreBuilder<AppState>(
+            onInit: (store) => store.dispatch(GetItemsAction()),
+            builder: (context, store) {
+              return MyHomePage(title: 'To-Do List', store: store);
+            }),
       ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key, required this.title, required this.store});
   final String title;
+  final Store<AppState> store;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();

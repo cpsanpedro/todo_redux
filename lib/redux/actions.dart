@@ -15,3 +15,10 @@ class DeleteItemAction {
   DeleteItemAction(this.item);
   final ToDoItem item;
 }
+
+class GetItemsAction {}
+
+class LoadedItemsAction {
+  LoadedItemsAction(this.items);
+  final List<ToDoItem> items;
+}
