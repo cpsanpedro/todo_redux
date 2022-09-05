@@ -1,12 +1,15 @@
-import 'package:redux/redux.dart';
+import 'package:built_value/built_value.dart';
 
 import '../model/model.dart';
 
-class ToDoViewModel {
-  ToDoViewModel({required this.items});
-  final List<ToDoItem> items;
+part 'view_model.g.dart';
 
-  factory ToDoViewModel.create(Store<AppState> store) {
-    return ToDoViewModel(items: store.state.items);
-  }
+abstract class ToDoViewModel
+    implements Built<ToDoViewModel, ToDoViewModelBuilder> {
+  List<ToDoItem>? get items;
+
+  ToDoViewModel._();
+
+  factory ToDoViewModel([void Function(ToDoViewModelBuilder) updates]) =
+      _$ToDoViewModel;
 }

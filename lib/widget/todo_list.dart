@@ -31,21 +31,23 @@ class _TodoListWidgetState extends State<TodoListWidget> {
   @override
   Widget build(BuildContext context) {
     print("ITEMS WIDGET ${widget.model.items}");
-    return ListView(
-        children: widget.model.items
-            .map((item) => Dismissible(
-                background: Container(
-                    alignment: Alignment.centerRight,
-                    color: Colors.red,
-                    child: const Padding(
-                      padding: EdgeInsets.only(right: 8.0),
-                      child: Icon(Icons.delete, color: Colors.white),
-                    )),
-                key: Key(item.id.toString()),
-                onDismissed: (direction) {
-                  _store?.dispatch(DeleteItemAction(item));
-                },
-                child: ListTile(title: Text(item.title))))
-            .toList());
+    return widget.model.items != null
+        ? ListView(
+            children: widget.model.items!
+                .map((item) => Dismissible(
+                    background: Container(
+                        alignment: Alignment.centerRight,
+                        color: Colors.red,
+                        child: const Padding(
+                          padding: EdgeInsets.only(right: 8.0),
+                          child: Icon(Icons.delete, color: Colors.white),
+                        )),
+                    key: Key(item.id.toString()),
+                    onDismissed: (direction) {
+                      _store?.dispatch(DeleteItemAction(item));
+                    },
+                    child: ListTile(title: Text(item.title))))
+                .toList())
+        : Container();
   }
 }

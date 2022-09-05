@@ -55,7 +55,8 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: StoreConnector<AppState, ToDoViewModel>(
-          converter: (Store<AppState> store) => ToDoViewModel.create(store),
+          converter: (Store<AppState> store) =>
+              ToDoViewModel((builder) => builder..items = store.state.items),
           builder: (BuildContext context, ToDoViewModel viewModel) {
             print("VM ${viewModel.items}");
             return Padding(
