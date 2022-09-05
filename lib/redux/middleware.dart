@@ -33,15 +33,14 @@ Stream<dynamic> saveEpic(Stream<dynamic> actions, EpicStore<AppState> store) {
       .asyncMap((action) => saveToPrefs(store.state));
 }
 
-Stream<dynamic> getEpic(
-    Stream<dynamic> actions, EpicStore<AppState> store) async* {
+Stream<dynamic> getEpic(Stream<dynamic> actions, EpicStore<AppState> store) {
   print("GET EPIC ${actions}");
 
-  var res = await getPrefs();
-  yield LoadedItemsAction(res.items);
+  // var res = await getPrefs();
+  // yield LoadedItemsAction(res.items);
 
-  // return actions.where((action) => action is GetItemsAction).asyncMap(
-  // (action) => getPrefs().then((value) => LoadedItemsAction(value.items)));
+  return actions.where((action) => action is GetItemsAction).asyncMap(
+      (action) => getPrefs().then((value) => LoadedItemsAction(value.items)));
 
   // yield actions
   //     .where((action) => action is GetItemsAction)

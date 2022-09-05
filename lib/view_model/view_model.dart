@@ -1,30 +1,12 @@
 import 'package:redux/redux.dart';
 
 import '../model/model.dart';
-import '../redux/actions.dart';
 
 class ToDoViewModel {
-  ToDoViewModel(
-      {required this.items,
-      required this.onAddItem,
-      required this.onDeleteItem});
+  ToDoViewModel({required this.items});
   final List<ToDoItem> items;
-  final Function(String) onAddItem;
-  final Function(ToDoItem) onDeleteItem;
 
   factory ToDoViewModel.create(Store<AppState> store) {
-    onAddItem(String title) {
-      print("VM ${title}");
-      store.dispatch(AddItemAction(title));
-    }
-
-    onDeleteItem(ToDoItem item) {
-      store.dispatch(DeleteItemAction(item));
-    }
-
-    return ToDoViewModel(
-        items: store.state.items,
-        onAddItem: onAddItem,
-        onDeleteItem: onDeleteItem);
+    return ToDoViewModel(items: store.state.items);
   }
 }

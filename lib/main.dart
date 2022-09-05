@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         home: StoreBuilder<AppState>(
             onInit: (store) => store.dispatch(GetItemsAction()),
             builder: (context, store) {
-              return MyHomePage(title: 'To-Do List', store: store);
+              return MyHomePage(title: 'To-Do List');
             }),
       ),
     );
@@ -40,9 +40,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title, required this.store});
+  const MyHomePage({super.key, required this.title});
   final String title;
-  final Store<AppState> store;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -58,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: StoreConnector<AppState, ToDoViewModel>(
           converter: (Store<AppState> store) => ToDoViewModel.create(store),
           builder: (BuildContext context, ToDoViewModel viewModel) {
+            print("VM ${viewModel.items}");
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(

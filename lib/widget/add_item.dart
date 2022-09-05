@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+import 'package:todo_redux/model/model.dart';
+import 'package:todo_redux/redux/actions.dart';
 
 import '../view_model/view_model.dart';
 
@@ -12,6 +16,13 @@ class AddItemWidget extends StatefulWidget {
 
 class _AddItemWidgetState extends State<AddItemWidget> {
   final TextEditingController controller = TextEditingController();
+  Store? _store;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _store = StoreProvider.of<AppState>(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +30,7 @@ class _AddItemWidgetState extends State<AddItemWidget> {
       controller: controller,
       decoration: const InputDecoration(hintText: "What are your goals?"),
       onSubmitted: (val) {
-        widget.model.onAddItem(val);
+        _store?.dispatch(AddItemAction(val));
         controller.clear();
       },
     );
