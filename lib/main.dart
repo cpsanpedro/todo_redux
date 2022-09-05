@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var epicMiddleware = EpicMiddleware(epic);
-    final Store<AppState> store = Store<AppState>(appStateReducer,
+    final Store<AppState> store = Store<AppState>(appReducer,
         initialState: AppState.init(), middleware: [epicMiddleware]);
     return StoreProvider<AppState>(
       store: store,
