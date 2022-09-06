@@ -44,7 +44,8 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                         )),
                     key: Key(item.id.toString()),
                     onDismissed: (direction) {
-                      _store?.dispatch(DeleteItemAction());
+                      _store?.dispatch(
+                          DeleteItemAction((b) => b.item = item.toBuilder()));
                     },
                     child: ListTile(title: Text(item.title ?? ""))))
                 .toList())

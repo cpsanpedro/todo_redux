@@ -18,10 +18,8 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   }
 
   factory AppState.fromJson(Map json) {
-    print("JSON ${json["items"].runtimeType}");
     return AppState((builder) {
       builder.items = ListBuilder<ToDoItem>((json["items"]).map((i) {
-        print("fromJson ${ToDoItem.fromJson(jsonEncode(i))}");
         return ToDoItem.fromJson(jsonEncode(i));
       }).toList());
     });

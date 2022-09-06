@@ -18,9 +18,11 @@ AppState addItemReducer(AppState state, AddItemAction action) {
 }
 
 AppState deleteItemReducer(AppState state, DeleteItemAction action) {
-  return AppState((builder) => builder
-    ..items =
-        state.toBuilder().items.remove(action.item) as ListBuilder<ToDoItem>?);
+  return AppState((builder) {
+    ListBuilder<ToDoItem> list = state.toBuilder().items;
+    list.remove(action.item);
+    builder.items = list;
+  });
 }
 
 AppState loadedItemReducer(AppState state, LoadedItemsAction action) {
