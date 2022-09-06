@@ -1,28 +1,52 @@
-class AppState {
-  const AppState({required this.items});
-  final List<ToDoItem> items;
+import 'dart:convert';
 
-  AppState.init() : items = List.unmodifiable([]);
+import 'package:built_collection/built_collection.dart';
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
 
-  AppState.fromJson(Map json)
-      : items =
-            (json["items"] as List).map((i) => ToDoItem.fromJson(i)).toList();
+import 'serializer.dart';
 
-  toJson() => {'items': items};
-}
+part 'model.g.dart';
 
-class ToDoItem {
-  const ToDoItem({required this.id, required this.title});
-  final int id;
-  final String title;
+abstract class AppState implements Built<AppState, AppStateBuilder> {
+  AppState._();
+  BuiltList<ToDoItem>? get items;
 
-  ToDoItem copyWith({int? id, String? title}) {
-    return ToDoItem(id: id ?? this.id, title: title ?? this.title);
+  factory AppState.init() {
+    return AppState(
+        (builder) => builder..items = <ToDoItem>[].build().toBuilder());
   }
 
-  ToDoItem.fromJson(Map json)
-      : id = json["id"],
-        title = json["title"];
+  factory AppState.fromJson(Map json) {
+    print("JSON ${json["items"].runtimeType}");
+    return AppState((builder) {
+      builder.items = ListBuilder<ToDoItem>((json["items"]).map((i) {
+        print("fromJson ${ToDoItem.fromJson(jsonEncode(i))}");
+        return ToDoItem.fromJson(jsonEncode(i));
+      }).toList());
+    });
+  }
 
-  Map toJson() => {'id': id, 'title': title};
+  toJson() => jsonEncode(serializers.serializeWith(AppState.serializer, this));
+  factory AppState([void Function(AppStateBuilder) updates]) = _$AppState;
+
+  static Serializer<AppState> get serializer => _$appStateSerializer;
+}
+
+abstract class ToDoItem implements Built<ToDoItem, ToDoItemBuilder> {
+  int? get id;
+  String? get title;
+
+  ToDoItem._();
+  factory ToDoItem([void Function(ToDoItemBuilder) updates]) = _$ToDoItem;
+
+  static ToDoItem? fromJson(String jsonStr) {
+    return serializers.deserializeWith(
+        ToDoItem.serializer, jsonDecode(jsonStr));
+  }
+
+  String toJson() =>
+      jsonEncode(serializers.serializeWith(ToDoItem.serializer, this));
+
+  static Serializer<ToDoItem> get serializer => _$toDoItemSerializer;
 }

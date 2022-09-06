@@ -30,7 +30,7 @@ class _TodoListWidgetState extends State<TodoListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("ITEMS WIDGET ${widget.model.items}");
+    print("ITEMS WIDGET ${widget.model.items.toString()}");
     return widget.model.items != null
         ? ListView(
             children: widget.model.items!
@@ -44,9 +44,9 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                         )),
                     key: Key(item.id.toString()),
                     onDismissed: (direction) {
-                      _store?.dispatch(DeleteItemAction(item));
+                      _store?.dispatch(DeleteItemAction());
                     },
-                    child: ListTile(title: Text(item.title))))
+                    child: ListTile(title: Text(item.title ?? ""))))
                 .toList())
         : Container();
   }

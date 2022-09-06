@@ -6,9 +6,59 @@ part of 'view_model.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
+Serializer<ToDoViewModel> _$toDoViewModelSerializer =
+    new _$ToDoViewModelSerializer();
+
+class _$ToDoViewModelSerializer implements StructuredSerializer<ToDoViewModel> {
+  @override
+  final Iterable<Type> types = const [ToDoViewModel, _$ToDoViewModel];
+  @override
+  final String wireName = 'ToDoViewModel';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, ToDoViewModel object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[];
+    Object? value;
+    value = object.items;
+    if (value != null) {
+      result
+        ..add('items')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(ToDoItem)])));
+    }
+    return result;
+  }
+
+  @override
+  ToDoViewModel deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = new ToDoViewModelBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'items':
+          result.items.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(ToDoItem)]))!
+              as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
 class _$ToDoViewModel extends ToDoViewModel {
   @override
-  final List<ToDoItem>? items;
+  final BuiltList<ToDoItem>? items;
 
   factory _$ToDoViewModel([void Function(ToDoViewModelBuilder)? updates]) =>
       (new ToDoViewModelBuilder()..update(updates))._build();
@@ -44,16 +94,17 @@ class ToDoViewModelBuilder
     implements Builder<ToDoViewModel, ToDoViewModelBuilder> {
   _$ToDoViewModel? _$v;
 
-  List<ToDoItem>? _items;
-  List<ToDoItem>? get items => _$this._items;
-  set items(List<ToDoItem>? items) => _$this._items = items;
+  ListBuilder<ToDoItem>? _items;
+  ListBuilder<ToDoItem> get items =>
+      _$this._items ??= new ListBuilder<ToDoItem>();
+  set items(ListBuilder<ToDoItem>? items) => _$this._items = items;
 
   ToDoViewModelBuilder();
 
   ToDoViewModelBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _items = $v.items;
+      _items = $v.items?.toBuilder();
       _$v = null;
     }
     return this;
@@ -74,7 +125,20 @@ class ToDoViewModelBuilder
   ToDoViewModel build() => _build();
 
   _$ToDoViewModel _build() {
-    final _$result = _$v ?? new _$ToDoViewModel._(items: items);
+    _$ToDoViewModel _$result;
+    try {
+      _$result = _$v ?? new _$ToDoViewModel._(items: _items?.build());
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'items';
+        _items?.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            r'ToDoViewModel', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

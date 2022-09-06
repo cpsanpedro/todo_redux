@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:built_collection/built_collection.dart';
 import 'package:redux_epics/redux_epics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_redux/model/model.dart';
@@ -7,10 +8,7 @@ import 'package:todo_redux/redux/actions.dart';
 
 void saveToPrefs(AppState state) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-
-  var stateString = jsonEncode(state.toJson());
-  print("SAVE: ${state.items}");
-  await prefs.setString("items", stateString);
+  await prefs.setString("items", state.toJson());
 }
 
 Future<AppState> getPrefs() async {
@@ -36,33 +34,10 @@ Stream<dynamic> saveEpic(Stream<dynamic> actions, EpicStore<AppState> store) {
 Stream<dynamic> getEpic(Stream<dynamic> actions, EpicStore<AppState> store) {
   print("GET EPIC ${actions}");
 
-  // var res = await getPrefs();
-  // yield LoadedItemsAction(res.items);
-
-  return actions.where((action) => action is GetItemsAction).asyncMap(
-      (action) => getPrefs().then((value) => LoadedItemsAction(value.items)));
-
-  // yield actions
-  //     .where((action) => action is GetItemsAction)
-  //     .asyncMap((action) => getPrefs().then((value) async* {
-  //           print("LOAD get epic ${value}");
-  //
-  //           yield LoadedItemsAction(value.items);
-  //         }));
+  return actions
+      .where((action) => action is GetItemsAction)
+      .asyncMap((action) => getPrefs().then((value) {
+            LoadedItemsAction(
+                (b) => b.items = ListBuilder<ToDoItem>(value.items!));
+          }));
 }
-
-// void appStateMiddleware(
-//     Store<AppState> store, action, NextDispatcher next) async {
-//   // if (action is AddItemAction || action is DeleteItemAction) {
-//   //   print("SAVE PREF ${action.item}");
-//   //   saveToPrefs(store.state);
-//   // }
-//
-//   if (action is GetItemsAction) {
-//     print("HET");
-//     await getPrefs().then((value) {
-//       print("LOAD ${value}");
-//       store.dispatch(LoadedItemsAction(value.items));
-//     });
-//   }
-// }

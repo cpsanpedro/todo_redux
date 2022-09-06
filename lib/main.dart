@@ -1,3 +1,4 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         home: StoreBuilder<AppState>(
             onInit: (store) => store.dispatch(GetItemsAction()),
             builder: (context, store) {
-              return MyHomePage(title: 'To-Do List');
+              return const MyHomePage(title: 'To-Do List');
             }),
       ),
     );
@@ -55,8 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: StoreConnector<AppState, ToDoViewModel>(
-          converter: (Store<AppState> store) =>
-              ToDoViewModel((builder) => builder..items = store.state.items),
+          converter: (Store<AppState> store) => ToDoViewModel(
+              (builder) => builder..items = ListBuilder(store.state.items!)),
           builder: (BuildContext context, ToDoViewModel viewModel) {
             print("VM ${viewModel.items}");
             return Padding(

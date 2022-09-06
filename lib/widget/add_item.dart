@@ -30,7 +30,9 @@ class _AddItemWidgetState extends State<AddItemWidget> {
       controller: controller,
       decoration: const InputDecoration(hintText: "What are your goals?"),
       onSubmitted: (val) {
-        _store?.dispatch(AddItemAction(val));
+        _store?.dispatch(AddItemAction((b) => b
+          ..title = controller.text
+          ..id = 1));
         controller.clear();
       },
     );

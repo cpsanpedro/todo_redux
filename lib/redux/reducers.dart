@@ -1,3 +1,4 @@
+import 'package:built_collection/src/list.dart';
 import 'package:redux/redux.dart';
 import 'package:todo_redux/redux/actions.dart';
 
@@ -10,14 +11,19 @@ final Reducer<AppState> appReducer = combineReducers<AppState>([
 ]);
 
 AppState addItemReducer(AppState state, AddItemAction action) {
-  return AppState(
-      items: [...state.items, ToDoItem(id: action.id, title: action.item)]);
+  print("REDEUCER ADD");
+  return AppState((builder) => builder
+    ..items = ListBuilder<ToDoItem>(
+        [...?state.items, ToDoItem((b) => b..title = action.title)]));
 }
 
 AppState deleteItemReducer(AppState state, DeleteItemAction action) {
-  return AppState(items: List.from(state.items)..remove(action.item));
+  return AppState((builder) => builder
+    ..items =
+        state.toBuilder().items.remove(action.item) as ListBuilder<ToDoItem>?);
 }
 
 AppState loadedItemReducer(AppState state, LoadedItemsAction action) {
-  return AppState(items: action.items);
+  print("LOADED ${action.items}");
+  return AppState((builder) => builder..items = action.items.toBuilder());
 }
