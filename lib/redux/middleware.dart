@@ -32,12 +32,7 @@ Stream<dynamic> saveEpic(Stream<dynamic> actions, EpicStore<AppState> store) {
 }
 
 Stream<dynamic> getEpic(Stream<dynamic> actions, EpicStore<AppState> store) {
-  print("GET EPIC ${actions}");
-
-  return actions
-      .where((action) => action is GetItemsAction)
-      .asyncMap((action) => getPrefs().then((value) {
-            LoadedItemsAction(
-                (b) => b.items = ListBuilder<ToDoItem>(value.items!));
-          }));
+  return actions.where((action) => action is GetItemsAction).asyncMap(
+      (action) => getPrefs().then((value) => LoadedItemsAction(
+          (b) => b.items = ListBuilder<ToDoItem>(value.items!))));
 }
