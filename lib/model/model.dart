@@ -32,7 +32,7 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
 }
 
 abstract class ToDoItem implements Built<ToDoItem, ToDoItemBuilder> {
-  int? get id;
+  String? get id;
   String? get title;
 
   ToDoItem._();

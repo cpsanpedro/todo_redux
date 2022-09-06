@@ -70,7 +70,8 @@ class _$ToDoItemSerializer implements StructuredSerializer<ToDoItem> {
     if (value != null) {
       result
         ..add('id')
-        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
     }
     value = object.title;
     if (value != null) {
@@ -95,7 +96,7 @@ class _$ToDoItemSerializer implements StructuredSerializer<ToDoItem> {
       switch (key) {
         case 'id':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int?;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'title':
           result.title = serializers.deserialize(value,
@@ -197,7 +198,7 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
 
 class _$ToDoItem extends ToDoItem {
   @override
-  final int? id;
+  final String? id;
   @override
   final String? title;
 
@@ -236,9 +237,9 @@ class _$ToDoItem extends ToDoItem {
 class ToDoItemBuilder implements Builder<ToDoItem, ToDoItemBuilder> {
   _$ToDoItem? _$v;
 
-  int? _id;
-  int? get id => _$this._id;
-  set id(int? id) => _$this._id = id;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
   String? _title;
   String? get title => _$this._title;

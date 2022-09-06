@@ -11,10 +11,14 @@ final Reducer<AppState> appReducer = combineReducers<AppState>([
 ]);
 
 AppState addItemReducer(AppState state, AddItemAction action) {
-  print("REDEUCER ADD");
+  print("REDEUCER ADD ${DateTime.now().toString()}");
   return AppState((builder) => builder
-    ..items = ListBuilder<ToDoItem>(
-        [...?state.items, ToDoItem((b) => b..title = action.title)]));
+    ..items = ListBuilder<ToDoItem>([
+      ...?state.items,
+      ToDoItem((b) => b
+        ..title = action.title
+        ..id = DateTime.now().toString())
+    ]));
 }
 
 AppState deleteItemReducer(AppState state, DeleteItemAction action) {

@@ -30,25 +30,29 @@ class _TodoListWidgetState extends State<TodoListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("ITEMS WIDGET ${widget.model.items.toString()}");
     return widget.model.items != null
-        ? ListView(
-            children: widget.model.items!
-                .map((item) => Dismissible(
-                    background: Container(
-                        alignment: Alignment.centerRight,
-                        color: Colors.red,
-                        child: const Padding(
-                          padding: EdgeInsets.only(right: 8.0),
-                          child: Icon(Icons.delete, color: Colors.white),
-                        )),
-                    key: Key(item.id.toString()),
-                    onDismissed: (direction) {
-                      _store?.dispatch(
-                          DeleteItemAction((b) => b.item = item.toBuilder()));
-                    },
-                    child: ListTile(title: Text(item.title ?? ""))))
-                .toList())
-        : Container();
+        ? Expanded(
+            child: ListView(
+                children: widget.model.items!
+                    .map((item) => Dismissible(
+                        background: Container(
+                            alignment: Alignment.centerRight,
+                            color: Colors.red,
+                            child: const Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Icon(Icons.delete, color: Colors.white),
+                            )),
+                        key: Key(item.id.toString()),
+                        onDismissed: (direction) {
+                          _store?.dispatch(DeleteItemAction(
+                              (b) => b.item = item.toBuilder()));
+                        },
+                        child: ListTile(title: Text(item.title ?? ""))))
+                    .toList()),
+          )
+        : Container(
+            color: Colors.red,
+            child: Text("CONNN"),
+          );
   }
 }

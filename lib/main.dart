@@ -59,13 +59,13 @@ class _MyHomePageState extends State<MyHomePage> {
           converter: (Store<AppState> store) => ToDoViewModel(
               (builder) => builder..items = ListBuilder(store.state.items!)),
           builder: (BuildContext context, ToDoViewModel viewModel) {
-            print("VM ${viewModel.items}");
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
+                mainAxisSize: MainAxisSize.max,
                 children: [
                   AddItemWidget(model: viewModel),
-                  Expanded(child: TodoListWidget(model: viewModel))
+                  TodoListWidget(model: viewModel)
                 ],
               ),
             );
