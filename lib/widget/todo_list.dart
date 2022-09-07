@@ -16,6 +16,7 @@ class TodoListWidget extends StatefulWidget {
 
 class _TodoListWidgetState extends State<TodoListWidget> {
   Store? _store;
+  TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -47,12 +48,37 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                           _store?.dispatch(DeleteItemAction(
                               (b) => b.item = item.toBuilder()));
                         },
-                        child: ListTile(title: Text(item.title ?? ""))))
+                        child: ListTile(
+                          title: Text(item.title ?? ""),
+                          onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text("Cancel")),
+                                      TextButton(
+                                          onPressed: () {
+                                            _store?.dispatch(
+                                                UpdateItemAction((b) => b.item
+                                                  ..title = _controller.text
+                                                  ..id = item.id));
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text("Edit"))
+                                    ],
+                                    content: TextField(
+                                        controller: _controller
+                                          ..text = item.title.toString()),
+                                  );
+                                });
+                          },
+                        )))
                     .toList()),
           )
-        : Container(
-            color: Colors.red,
-            child: Text("CONNN"),
-          );
+        : Container();
   }
 }

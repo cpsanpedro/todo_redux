@@ -15,7 +15,6 @@ Future<AppState> getPrefs() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var stateString = prefs.getString("items");
 
-  print("STATE STR ${stateString}");
   if (stateString != null) {
     Map map = jsonDecode(stateString);
     return AppState.fromJson(map);
@@ -27,12 +26,19 @@ final epic = combineEpics<AppState>([saveEpic, getEpic]);
 
 Stream<dynamic> saveEpic(Stream<dynamic> actions, EpicStore<AppState> store) {
   return actions
-      .where((action) => action is AddItemAction || action is DeleteItemAction)
+      .where((action) =>
+          action is AddItemAction ||
+          action is DeleteItemAction ||
+          action is UpdateItemAction)
       .asyncMap((action) => saveToPrefs(store.state));
 }
 
 Stream<dynamic> getEpic(Stream<dynamic> actions, EpicStore<AppState> store) {
-  return actions.where((action) => action is GetItemsAction).asyncMap(
-      (action) => getPrefs().then((value) => LoadedItemsAction(
-          (b) => b.items = ListBuilder<ToDoItem>(value.items!))));
+  return actions
+      .where((action) => action is GetItemsAction)
+      .asyncMap((action) => getPrefs().then((value) {
+            print("GET EPIC");
+            return LoadedItemsAction(
+                (b) => b.items = ListBuilder<ToDoItem>(value.items!));
+          }));
 }

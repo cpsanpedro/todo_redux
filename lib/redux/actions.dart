@@ -34,3 +34,12 @@ abstract class LoadedItemsAction
   factory LoadedItemsAction([void Function(LoadedItemsActionBuilder) updates]) =
       _$LoadedItemsAction;
 }
+
+abstract class UpdateItemAction
+    implements Built<UpdateItemAction, UpdateItemActionBuilder> {
+  ToDoItem get item;
+  UpdateItemAction._();
+
+  factory UpdateItemAction([void Function(UpdateItemActionBuilder) updates]) =
+      _$UpdateItemAction;
+}
