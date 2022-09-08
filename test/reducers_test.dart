@@ -42,7 +42,8 @@ void main() {
   });
 
   test('delete one todo', () {
-    store.dispatch(DeleteItemAction((b) => b.item = mockToDoItem.toBuilder()));
+    store.dispatch(
+        DeleteItemAction((b) => b.item = updatedMockToDoItem.toBuilder()));
     expect(store.state, AppState.init());
   });
 }
