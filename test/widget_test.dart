@@ -5,26 +5,44 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_epics/redux_epics.dart';
+import 'package:todo_redux/model/model.dart';
+import 'package:todo_redux/redux/middleware.dart';
+import 'package:todo_redux/redux/reducers.dart';
+import 'package:todo_redux/view_model/view_model.dart';
+import 'package:todo_redux/widget/todo_list.dart';
 
-import 'package:todo_redux/main.dart';
+import 'mock_data.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Todo list', (tester) async {
+    var epicMiddleware = EpicMiddleware(epic);
+    final Store<AppState> store = Store<AppState>(appReducer,
+        initialState: mockTodos(), middleware: [epicMiddleware]);
+    final ToDoViewModel viewModel = ToDoViewModel(
+        (builder) => builder..items = ListBuilder(store.state.items!));
+    await tester.pumpWidget(StoreProvider<AppState>(
+      store: store,
+      child: MaterialApp(
+        home: Scaffold(
+          body: Column(
+            children: [
+              TodoListWidget(model: viewModel),
+            ],
+          ),
+        ),
+      ),
+    ));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    mockList.forEach((element) {
+      expect(find.text(element.title!), findsOneWidget);
+    });
   });
 }
