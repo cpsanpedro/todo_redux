@@ -18,7 +18,7 @@ AppState addItemReducer(AppState state, AddItemAction action) {
       ...?state.items,
       ToDoItem((b) => b
         ..title = action.title
-        ..id = DateTime.now().toString())
+        ..id = action.id)
     ]));
 }
 

@@ -8,7 +8,7 @@ part of 'actions.dart';
 
 class _$AddItemAction extends AddItemAction {
   @override
-  final int? id;
+  final String? id;
   @override
   final String? title;
 
@@ -48,9 +48,9 @@ class AddItemActionBuilder
     implements Builder<AddItemAction, AddItemActionBuilder> {
   _$AddItemAction? _$v;
 
-  int? _id;
-  int? get id => _$this._id;
-  set id(int? id) => _$this._id = id;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
   String? _title;
   String? get title => _$this._title;

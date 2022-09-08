@@ -6,7 +6,7 @@ part 'actions.g.dart';
 
 abstract class AddItemAction
     implements Built<AddItemAction, AddItemActionBuilder> {
-  int? get id;
+  String? get id;
   String? get title;
 
   AddItemAction._();

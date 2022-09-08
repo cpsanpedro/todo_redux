@@ -32,7 +32,7 @@ class _AddItemWidgetState extends State<AddItemWidget> {
       onSubmitted: (val) {
         _store?.dispatch(AddItemAction((b) => b
           ..title = controller.text
-          ..id = 1));
+          ..id = DateTime.now().toString().substring(0, 19)));
         controller.clear();
       },
     );
