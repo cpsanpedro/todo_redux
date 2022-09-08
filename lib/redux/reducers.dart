@@ -12,7 +12,7 @@ final Reducer<AppState> appReducer = combineReducers<AppState>([
 ]);
 
 AppState addItemReducer(AppState state, AddItemAction action) {
-  print("REDEUCER ADD ${DateTime.now().toString()}");
+  print("REDUCER ADD ${DateTime.now().toString()}");
   return AppState((builder) => builder
     ..items = ListBuilder<ToDoItem>([
       ...?state.items,
@@ -35,10 +35,14 @@ AppState loadedItemReducer(AppState state, LoadedItemsAction action) {
 }
 
 AppState updateItemReducer(AppState state, UpdateItemAction action) {
+  print("ACTION UPDATE ${action.item}");
   return AppState((builder) {
     ListBuilder<ToDoItem> list = state.toBuilder().items;
+    print("STATE UPDATE ${state.toBuilder().items.length}");
     list.map((p0) {
+      print("HERE ${p0}");
       if (p0.id == action.item.id) {
+
         p0 = ToDoItem((b) => b
           ..title = action.item.title
           ..id = action.item.id);
