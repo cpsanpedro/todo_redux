@@ -1,62 +1,52 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_epics/redux_epics.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_redux/model/model.dart';
 import 'package:todo_redux/redux/actions.dart';
 import 'package:todo_redux/redux/middleware.dart';
+import 'package:todo_redux/redux/reducers.dart';
 
+import 'middleware_test.mocks.dart';
 import 'mock_data.dart';
 
-class MockRepo extends Mock implements Repo {}
-
-class MockStore extends Mock implements Store<AppState> {}
-
+@GenerateMocks([Repo])
 void main() {
-  MockRepo repo;
-  MockStore? mockStore;
+  TestWidgetsFlutterBinding.ensureInitialized();
+  Store<AppState> store;
+  MockRepo mockRepo = MockRepo();
 
-  setUp(() {
-    mockStore = MockStore();
+  setUpAll(() {
+    const MethodChannel('plugins.flutter.io/shared_preferences_macos')
+        .setMockMethodCallHandler((MethodCall methodCall) async {
+      if (methodCall.method == 'getAll') {
+        return <String, dynamic>{
+          "flutter.id": "1"
+        }; // set initial values here if desired
+      }
+      return null;
+    });
   });
 
-  test('should load', () {
-    repo = MockRepo();
+  test('should load', () async {
+    var appMiddleware = AppMiddleware();
+    final epics = combineEpics<AppState>([appMiddleware]);
+    store = Store<AppState>(appReducer,
+        initialState: mockTodo(), middleware: [EpicMiddleware(epics)]);
 
-    var epicMiddleware = EpicMiddleware(epic);
-    // final store = Store<AppState>(
-    //   appReducer,
-    //   initialState: AppState.init(),
-    //   middleware: [epicMiddleware],
-    // );
+    SharedPreferences.setMockInitialValues({"items": AppState.init()});
 
-    final action = AddItemAction((b) => b
+    store.dispatch(AddItemAction((b) => b
       ..id = "1"
-      ..title = "Item 1");
+      ..title = "Item 1"));
 
-    final state = AddItemAction((b) => b
-      ..id = "1"
-      ..title = "Item 1");
+    when(mockRepo.saveTodos(mockTodo())).thenAnswer((realInvocation) {
+      return Future.value(mockTodo());
+    });
 
-    Stream<dynamic> actual = getEpic.call(
-      Stream.fromIterable([action]).asBroadcastStream(),
-      EpicStore<AppState>(mockStore!),
-    );
-
-    when(repo.saveToPrefs(mockStore!.state))
-        .thenAnswer((realInvocation) => Future.value(mockTodo()));
-
-    // verify(repo.getPrefs());
-
-    // when(repository.loadTodos()).thenAnswer((_) => Future.value(todos));
-
-    // mockStore?.dispatch(LoadedItemsAction());
-
-    // expect(actual, [
-    //   GetItemsAction(),
-    //   AddItemAction((b) => b
-    //     ..id = mockToDoItem.id
-    //     ..title = mockToDoItem.title)
-    // ]);
+    verify(mockRepo.saveTodos(mockTodo()));
   });
 }

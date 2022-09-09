@@ -21,9 +21,10 @@ import 'mock_data.dart';
 
 void main() {
   testWidgets('Todo list', (tester) async {
-    var epicMiddleware = EpicMiddleware(epic);
-    final Store<AppState> store = Store<AppState>(appReducer,
-        initialState: mockTodos(), middleware: [epicMiddleware]);
+    var appMiddleware = AppMiddleware();
+    final epics = combineEpics<AppState>([appMiddleware]);
+    final store = Store<AppState>(appReducer,
+        initialState: AppState.init(), middleware: [EpicMiddleware(epics)]);
     final ToDoViewModel viewModel = ToDoViewModel(
         (builder) => builder..items = ListBuilder(store.state.items!));
     await tester.pumpWidget(StoreProvider<AppState>(

@@ -13,6 +13,7 @@ import 'widget/add_item.dart';
 import 'widget/todo_list.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -20,9 +21,10 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    var epicMiddleware = EpicMiddleware(epic);
+    var epicMiddleware = AppMiddleware();
+    final epics = combineEpics<AppState>([epicMiddleware]);
     final Store<AppState> store = Store<AppState>(appReducer,
-        initialState: AppState.init(), middleware: [epicMiddleware]);
+        initialState: AppState.init(), middleware: [EpicMiddleware(epics)]);
     return StoreProvider<AppState>(
       store: store,
       child: MaterialApp(
