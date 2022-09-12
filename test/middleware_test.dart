@@ -1,6 +1,6 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_epics/redux_epics.dart';
@@ -9,11 +9,14 @@ import 'package:todo_redux/model/model.dart';
 import 'package:todo_redux/redux/actions.dart';
 import 'package:todo_redux/redux/middleware.dart';
 import 'package:todo_redux/redux/reducers.dart';
+import 'package:todo_redux/repository/repo.dart';
 
-import 'middleware_test.mocks.dart';
 import 'mock_data.dart';
 
-@GenerateMocks([Repo])
+// @GenerateMocks([Repo])
+
+class MockRepo extends Mock implements AbstractRepo {}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   Store<AppState> store;
@@ -39,14 +42,26 @@ void main() {
 
     SharedPreferences.setMockInitialValues({"items": AppState.init()});
 
-    store.dispatch(AddItemAction((b) => b
+    AddItemAction addItemAction = AddItemAction((b) => b
       ..id = "1"
-      ..title = "Item 1"));
+      ..title = "Item 1");
 
-    when(mockRepo.saveTodos(mockTodo())).thenAnswer((realInvocation) {
+    LoadedItemsAction loadedItemsAction =
+        LoadedItemsAction((b) => ListBuilder(mockList));
+
+    store.dispatch(addItemAction);
+
+    when(mockRepo.getTodos()).thenAnswer((realInvocation) {
       return Future.value(mockTodo());
     });
 
-    verify(mockRepo.saveTodos(mockTodo()));
+    Stream<dynamic> stream = appMiddleware.call(
+      Stream.fromIterable([loadedItemsAction]).asBroadcastStream(),
+      EpicStore(store),
+    );
+
+    expect(await stream.toList(), mockTodo());
+
+    // verify(mockRepo.saveTodos(mockTodo()));
   });
 }

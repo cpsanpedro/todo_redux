@@ -7,7 +7,7 @@ import 'dart:async' as _i4;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:todo_redux/model/model.dart' as _i2;
-import 'package:todo_redux/redux/middleware.dart' as _i3;
+import 'package:todo_redux/repository/repo.dart' as _i3;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -34,13 +34,13 @@ class MockRepo extends _i1.Mock implements _i3.Repo {
   }
 
   @override
-  _i4.Future<_i2.AppState> getPrefs() =>
-      (super.noSuchMethod(Invocation.method(#getPrefs, []),
+  _i4.Future<_i2.AppState> getTodos() =>
+      (super.noSuchMethod(Invocation.method(#getTodos, []),
               returnValue: _i4.Future<_i2.AppState>.value(
-                  _FakeAppState_0(this, Invocation.method(#getPrefs, []))))
+                  _FakeAppState_0(this, Invocation.method(#getTodos, []))))
           as _i4.Future<_i2.AppState>);
   @override
-  void saveToPrefs(_i2.AppState? state) =>
-      super.noSuchMethod(Invocation.method(#saveToPrefs, [state]),
+  void saveTodos(_i2.AppState? state) =>
+      super.noSuchMethod(Invocation.method(#saveTodos, [state]),
           returnValueForMissingStub: null);
 }
