@@ -36,16 +36,12 @@ void main() {
     var appMiddleware = AppMiddleware(mockRepo);
     final epics = combineEpics<AppState>([appMiddleware]);
     store = Store<AppState>(appReducer,
-        initialState: mockTodo(), middleware: [EpicMiddleware(epics)]);
+        initialState: AppState.init(), middleware: [EpicMiddleware(epics)]);
 
     SharedPreferences.setMockInitialValues({"items": AppState.init()});
 
-    AddItemAction addItemAction = AddItemAction((b) => b
-      ..id = "1"
-      ..title = "Item 1");
-
     LoadedItemsAction loadedItemsAction =
-        LoadedItemsAction((b) => ListBuilder(mockList));
+        LoadedItemsAction((b) => b.items = ListBuilder([mockList.first]));
 
     when(mockRepo.getTodos()).thenAnswer((realInvocation) {
       return Future.value(mockTodo());
@@ -56,12 +52,6 @@ void main() {
       EpicStore(store),
     );
 
-    stream.toList().then((value) {
-      print("STREAM");
-    });
-
-    // expect(await stream.toList(), mockTodo());
-
-    // verify(mockRepo.saveTodos(mockTodo()));
+    expect(await stream.toList(), [loadedItemsAction]);
   });
 }

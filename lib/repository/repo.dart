@@ -3,7 +3,7 @@ import '../services/api.dart';
 
 abstract class AbstractRepo {
   void saveTodos(AppState state);
-  Future<AppState> getTodos();
+  Future<AppState>? getTodos();
 }
 
 class Repo implements AbstractRepo {

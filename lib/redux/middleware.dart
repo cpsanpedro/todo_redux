@@ -22,26 +22,26 @@ class AppMiddleware extends EpicClass<AppState> {
     )(actions, store);
   }
 
-  Stream<dynamic> getEpic(Stream<dynamic> actions, EpicStore<AppState> store) {
-    print("GET EPIC ${actions.runtimeType}");
-    return actions
-        .where((action) => action is GetItemsAction)
-        .asyncMap((action) {
-      return todoRepo.getTodos().then((value) {
-        return LoadedItemsAction(
-            (b) => b.items = ListBuilder<ToDoItem>(value.items!));
-      });
-    });
+  Stream<dynamic> getEpic(
+      Stream<dynamic> actions, EpicStore<AppState> store) async* {
+    await for (final action in actions) {
+      if (action is GetItemsAction) {
+        final todos = await todoRepo.getTodos();
+        yield LoadedItemsAction((b) => b.items = todos?.items != null
+            ? ListBuilder<ToDoItem>(todos!.items!)
+            : ListBuilder());
+      }
+    }
   }
 
-  Stream<dynamic> saveEpic(Stream<dynamic> actions, EpicStore<AppState> store) {
-    print("SAVE EPIC ${store.state}");
-
-    return actions
-        .where((action) =>
-            action is AddItemAction ||
-            action is DeleteItemAction ||
-            action is UpdateItemAction)
-        .asyncMap((action) => todoRepo.saveTodos(store.state));
+  Stream<dynamic> saveEpic(
+      Stream<dynamic> actions, EpicStore<AppState> store) async* {
+    await for (final action in actions) {
+      if (action is AddItemAction ||
+          action is DeleteItemAction ||
+          action is UpdateItemAction) {
+        todoRepo.saveTodos(store.state);
+      }
+    }
   }
 }
