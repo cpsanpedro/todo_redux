@@ -13,14 +13,11 @@ import 'package:todo_redux/repository/repo.dart';
 
 import 'mock_data.dart';
 
-// @GenerateMocks([Repo])
-
 class MockRepo extends Mock implements AbstractRepo {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   Store<AppState> store;
-  MockRepo mockRepo = MockRepo();
 
   setUpAll(() {
     const MethodChannel('plugins.flutter.io/shared_preferences_macos')
@@ -35,7 +32,8 @@ void main() {
   });
 
   test('should load', () async {
-    var appMiddleware = AppMiddleware();
+    MockRepo mockRepo = MockRepo();
+    var appMiddleware = AppMiddleware(mockRepo);
     final epics = combineEpics<AppState>([appMiddleware]);
     store = Store<AppState>(appReducer,
         initialState: mockTodo(), middleware: [EpicMiddleware(epics)]);
@@ -49,18 +47,20 @@ void main() {
     LoadedItemsAction loadedItemsAction =
         LoadedItemsAction((b) => ListBuilder(mockList));
 
-    store.dispatch(addItemAction);
-
     when(mockRepo.getTodos()).thenAnswer((realInvocation) {
       return Future.value(mockTodo());
     });
 
     Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([loadedItemsAction]).asBroadcastStream(),
+      Stream.fromIterable([GetItemsAction()]).asBroadcastStream(),
       EpicStore(store),
     );
 
-    expect(await stream.toList(), mockTodo());
+    stream.toList().then((value) {
+      print("STREAM");
+    });
+
+    // expect(await stream.toList(), mockTodo());
 
     // verify(mockRepo.saveTodos(mockTodo()));
   });

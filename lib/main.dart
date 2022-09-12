@@ -2,12 +2,10 @@ import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:redux_epics/redux_epics.dart';
 import 'package:todo_redux/model/model.dart';
 import 'package:todo_redux/redux/actions.dart';
-import 'package:todo_redux/redux/reducers.dart';
+import 'package:todo_redux/shared/store.dart';
 
-import 'redux/middleware.dart';
 import 'view_model/view_model.dart';
 import 'widget/add_item.dart';
 import 'widget/todo_list.dart';
@@ -21,10 +19,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    var epicMiddleware = AppMiddleware();
-    final epics = combineEpics<AppState>([epicMiddleware]);
-    final Store<AppState> store = Store<AppState>(appReducer,
-        initialState: AppState.init(), middleware: [EpicMiddleware(epics)]);
+    final store = initStore();
     return StoreProvider<AppState>(
       store: store,
       child: MaterialApp(

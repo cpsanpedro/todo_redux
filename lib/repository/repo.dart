@@ -8,13 +8,12 @@ abstract class AbstractRepo {
 
 class Repo implements AbstractRepo {
   @override
-  getTodos() {
+  Future<AppState> getTodos() {
     return Api.getTodos();
   }
 
   @override
   void saveTodos(AppState state) {
-    print("SAVE TODO! ${state}");
     return Api.saveTodos(state);
   }
 }

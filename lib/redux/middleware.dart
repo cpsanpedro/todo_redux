@@ -6,9 +6,11 @@ import 'package:todo_redux/redux/actions.dart';
 import '../repository/repo.dart';
 
 class AppMiddleware extends EpicClass<AppState> {
+  AppMiddleware(this.todoRepo);
+  final AbstractRepo todoRepo;
+
   @override
   Stream call(Stream actions, EpicStore<AppState> store) {
-    // print("call ${await actions.toList()}");
     combineEpics<AppState>(
       [saveEpic, getEpic],
     )(actions, store)
@@ -21,19 +23,18 @@ class AppMiddleware extends EpicClass<AppState> {
   }
 
   Stream<dynamic> getEpic(Stream<dynamic> actions, EpicStore<AppState> store) {
-    Repo repo = Repo();
+    print("GET EPIC ${actions.runtimeType}");
     return actions
         .where((action) => action is GetItemsAction)
-        .asyncMap((action) => repo.getTodos().then((value) {
-              print("GET EPIC");
-              return LoadedItemsAction(
-                  (b) => b.items = ListBuilder<ToDoItem>(value.items!));
-            }));
+        .asyncMap((action) {
+      return todoRepo.getTodos().then((value) {
+        return LoadedItemsAction(
+            (b) => b.items = ListBuilder<ToDoItem>(value.items!));
+      });
+    });
   }
 
   Stream<dynamic> saveEpic(Stream<dynamic> actions, EpicStore<AppState> store) {
-    Repo repo = Repo();
-
     print("SAVE EPIC ${store.state}");
 
     return actions
@@ -41,6 +42,6 @@ class AppMiddleware extends EpicClass<AppState> {
             action is AddItemAction ||
             action is DeleteItemAction ||
             action is UpdateItemAction)
-        .asyncMap((action) => repo.saveTodos(store.state));
+        .asyncMap((action) => todoRepo.saveTodos(store.state));
   }
 }
