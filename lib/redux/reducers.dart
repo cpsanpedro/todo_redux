@@ -8,7 +8,8 @@ final Reducer<AppState> appReducer = combineReducers<AppState>([
   TypedReducer<AppState, AddItemAction>(addItemReducer),
   TypedReducer<AppState, DeleteItemAction>(deleteItemReducer),
   TypedReducer<AppState, LoadedItemsAction>(loadedItemReducer),
-  TypedReducer<AppState, UpdateItemAction>(updateItemReducer)
+  TypedReducer<AppState, UpdateItemAction>(updateItemReducer),
+  TypedReducer<AppState, LoadingAction>(loadingReducer)
 ]);
 
 AppState addItemReducer(AppState state, AddItemAction action) {
@@ -31,7 +32,9 @@ AppState deleteItemReducer(AppState state, DeleteItemAction action) {
 }
 
 AppState loadedItemReducer(AppState state, LoadedItemsAction action) {
-  return AppState((builder) => builder..items = action.items.toBuilder());
+  return AppState((builder) => builder
+    ..items = action.items.toBuilder()
+    ..isLoading = false);
 }
 
 AppState updateItemReducer(AppState state, UpdateItemAction action) {
@@ -42,7 +45,6 @@ AppState updateItemReducer(AppState state, UpdateItemAction action) {
     list.map((p0) {
       print("HERE ${p0}");
       if (p0.id == action.item.id) {
-
         p0 = ToDoItem((b) => b
           ..title = action.item.title
           ..id = action.item.id);
@@ -50,5 +52,12 @@ AppState updateItemReducer(AppState state, UpdateItemAction action) {
       return p0;
     });
     builder.items = list;
+    builder.isLoading = true;
   });
+}
+
+AppState loadingReducer(AppState state, LoadingAction action) {
+  return AppState((builder) => builder
+    ..items = state.toBuilder().items
+    ..isLoading = action.isLoading);
 }

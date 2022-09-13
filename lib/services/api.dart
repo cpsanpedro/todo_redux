@@ -18,9 +18,9 @@ class Api {
     return AppState.init();
   }
 
-  static void saveTodos(AppState state) async {
+  static Future<bool> saveTodos(AppState state) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print("save prefs ${state.toJson()}");
-    await prefs.setString("items", state.toJson());
+    return prefs.setString("items", state.toJson());
   }
 }

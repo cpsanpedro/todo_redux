@@ -43,3 +43,12 @@ abstract class UpdateItemAction
   factory UpdateItemAction([void Function(UpdateItemActionBuilder) updates]) =
       _$UpdateItemAction;
 }
+
+abstract class LoadingAction
+    implements Built<LoadingAction, LoadingActionBuilder> {
+  bool? get isLoading;
+  LoadingAction._();
+
+  factory LoadingAction([void Function(LoadingActionBuilder) updates]) =
+      _$LoadingAction;
+}

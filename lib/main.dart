@@ -53,8 +53,10 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: StoreConnector<AppState, ToDoViewModel>(
-          converter: (Store<AppState> store) => ToDoViewModel(
-              (builder) => builder..items = ListBuilder(store.state.items!)),
+          converter: (Store<AppState> store) =>
+              ToDoViewModel((builder) => builder
+                ..items = ListBuilder(store.state.items!)
+                ..isLoading = false),
           builder: (BuildContext context, ToDoViewModel viewModel) {
             return Padding(
               padding: const EdgeInsets.all(16.0),

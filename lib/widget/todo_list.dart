@@ -1,3 +1,4 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -50,8 +51,8 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                         },
                         child: ListTile(
                           title: Text(item.title ?? ""),
-                          onTap: () {
-                            showDialog(
+                          onTap: () async {
+                            await showDialog(
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
@@ -60,15 +61,50 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                                           onPressed: () =>
                                               Navigator.pop(context),
                                           child: Text("Cancel")),
-                                      TextButton(
-                                          onPressed: () {
-                                            _store?.dispatch(
-                                                UpdateItemAction((b) => b.item
-                                                  ..title = _controller.text
-                                                  ..id = item.id));
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text("Edit"))
+                                      StoreConnector<AppState, ToDoViewModel>(
+                                        converter: (store) => ToDoViewModel(
+                                            (b) => b
+                                              ..items = ListBuilder(
+                                                  store.state.items!)
+                                              ..isLoading =
+                                                  store.state.isLoading),
+                                        distinct: true,
+                                        builder: (context, viewModel) {
+                                          print(
+                                              "IS LOOADING ${viewModel.isLoading}");
+                                          final isLoading =
+                                              viewModel.isLoading ?? false;
+                                          if (isLoading) {
+                                            return const CircularProgressIndicator();
+                                          } else {
+                                            return TextButton(
+                                                onPressed: () async {
+                                                  _store?.dispatch(
+                                                      UpdateItemAction(
+                                                          (b) => b.item
+                                                            ..title =
+                                                                _controller.text
+                                                            ..id = item.id));
+                                                  await Future.delayed(
+                                                      const Duration(
+                                                          seconds: 1));
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text("Edit"));
+                                          }
+                                          // return ToDoViewModel(
+                                          //   child: TextButton(
+                                          //       onPressed: () {
+                                          //         _store?.dispatch(
+                                          //             UpdateItemAction((b) => b.item
+                                          //               ..title = _controller.text
+                                          //               ..id = item.id));
+                                          //         Navigator.pop(context);
+                                          //       },
+                                          //       child: Text("Edit")),
+                                          // );
+                                        },
+                                      )
                                     ],
                                     content: TextField(
                                         controller: _controller

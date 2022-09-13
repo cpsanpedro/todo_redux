@@ -12,6 +12,7 @@ part 'view_model.g.dart';
 abstract class ToDoViewModel
     implements Built<ToDoViewModel, ToDoViewModelBuilder> {
   BuiltList<ToDoItem>? get items;
+  bool? get isLoading;
 
   ToDoViewModel._();
 

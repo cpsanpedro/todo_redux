@@ -11,13 +11,19 @@ import 'package:todo_redux/redux/middleware.dart';
 import 'package:todo_redux/redux/reducers.dart';
 import 'package:todo_redux/repository/repo.dart';
 
+// @GenerateMocks([Repo])
+// import 'middleware_test.mocks.dart';
 import 'mock_data.dart';
 
 class MockRepo extends Mock implements AbstractRepo {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  Store<AppState> store;
+  MockRepo mockRepo = MockRepo();
+  var appMiddleware = AppMiddleware(mockRepo);
+  final epics = combineEpics<AppState>([appMiddleware]);
+  Store<AppState> store = Store<AppState>(appReducer,
+      initialState: AppState.init(), middleware: [EpicMiddleware(epics)]);
 
   setUpAll(() {
     const MethodChannel('plugins.flutter.io/shared_preferences_macos')
@@ -31,15 +37,25 @@ void main() {
     });
   });
 
-  test('should load', () async {
-    MockRepo mockRepo = MockRepo();
-    var appMiddleware = AppMiddleware(mockRepo);
-    final epics = combineEpics<AppState>([appMiddleware]);
-    store = Store<AppState>(appReducer,
-        initialState: AppState.init(), middleware: [EpicMiddleware(epics)]);
-
+  test('should load init', () async {
     SharedPreferences.setMockInitialValues({"items": AppState.init()});
+    LoadedItemsAction emptyLoaded =
+        LoadedItemsAction((b) => b.items = ListBuilder([]));
 
+    when(mockRepo.getTodos()).thenAnswer((realInvocation) {
+      return Future.value(AppState.init());
+    });
+
+    Stream<dynamic> stream = appMiddleware.call(
+      Stream.fromIterable([GetItemsAction()]).asBroadcastStream(),
+      EpicStore(store),
+    );
+
+    expect(await stream.toList(), [emptyLoaded]);
+  });
+
+  test('should load 1 item', () async {
+    SharedPreferences.setMockInitialValues({"items": AppState.init()});
     LoadedItemsAction loadedItemsAction =
         LoadedItemsAction((b) => b.items = ListBuilder([mockList.first]));
 
@@ -53,5 +69,40 @@ void main() {
     );
 
     expect(await stream.toList(), [loadedItemsAction]);
+  });
+
+  test('should add another item', () async {
+    MockRepo mockRepo = MockRepo();
+    var appMiddleware = AppMiddleware(mockRepo);
+    final epics = combineEpics<AppState>([appMiddleware]);
+    store = Store<AppState>(appReducer,
+        initialState: AppState.init(), middleware: [EpicMiddleware(epics)]);
+
+    SharedPreferences.setMockInitialValues({"items": AppState.init()});
+
+    AddItemAction addItemAction = AddItemAction((b) => b
+      ..id = mockToDoItem.id
+      ..title = mockToDoItem.title);
+    AddItemAction addAnotherItemAction = AddItemAction((b) => b
+      ..id = anotherMockToDoItem.id
+      ..title = anotherMockToDoItem.title);
+    LoadingAction isLoading = LoadingAction((b) => b.isLoading = true);
+    LoadingAction notLoading = LoadingAction((b) => b.isLoading = false);
+
+    store.dispatch(addItemAction);
+    store.dispatch(addAnotherItemAction);
+
+    when(mockRepo.saveTodos(mockTodo())).thenAnswer((realInvocation) {
+      return Future.value(true);
+    });
+
+    Stream<dynamic> stream = appMiddleware.call(
+      Stream.fromIterable([addItemAction, addAnotherItemAction])
+          .asBroadcastStream(),
+      EpicStore(store),
+    );
+
+    expect(
+        await stream.toList(), [isLoading, notLoading, isLoading, notLoading]);
   });
 }

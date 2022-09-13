@@ -11,17 +11,21 @@ part 'model.g.dart';
 abstract class AppState implements Built<AppState, AppStateBuilder> {
   AppState._();
   BuiltList<ToDoItem>? get items;
+  bool? get isLoading;
 
   factory AppState.init() {
-    return AppState(
-        (builder) => builder..items = <ToDoItem>[].build().toBuilder());
+    return AppState((builder) => builder
+      ..items = <ToDoItem>[].build().toBuilder()
+      ..isLoading = false);
   }
 
   factory AppState.fromJson(Map json) {
     return AppState((builder) {
-      builder.items = ListBuilder<ToDoItem>((json["items"]).map((i) {
-        return ToDoItem.fromJson(jsonEncode(i));
-      }).toList());
+      builder
+        ..items = ListBuilder<ToDoItem>((json["items"]).map((i) {
+          return ToDoItem.fromJson(jsonEncode(i));
+        }).toList())
+        ..isLoading = false;
     });
   }
 
