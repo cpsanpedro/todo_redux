@@ -105,4 +105,24 @@ void main() {
     expect(
         await stream.toList(), [isLoading, notLoading, isLoading, notLoading]);
   });
+
+  test('should delete 1 item', () async {
+    SharedPreferences.setMockInitialValues({"items": AppState.init()});
+    DeleteItemAction deleteItemAction =
+        DeleteItemAction((b) => b.item = mockToDoItem.toBuilder());
+
+    LoadingAction isLoading = LoadingAction((b) => b.isLoading = true);
+    LoadingAction notLoading = LoadingAction((b) => b.isLoading = false);
+
+    when(mockRepo.saveTodos(mockTodo())).thenAnswer((realInvocation) {
+      return Future.value(true);
+    });
+
+    Stream<dynamic> stream = appMiddleware.call(
+      Stream.fromIterable([deleteItemAction]).asBroadcastStream(),
+      EpicStore(store),
+    );
+
+    expect(await stream.toList(), [isLoading, notLoading]);
+  });
 }
