@@ -2,6 +2,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:todo_redux/constants/consts.dart';
 import 'package:todo_redux/redux/actions.dart';
 import 'package:todo_redux/view_model/view_model.dart';
 
@@ -56,6 +57,7 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
+                                    key: Key(TDKey.dialog),
                                     actions: [
                                       TextButton(
                                           onPressed: () =>
@@ -78,6 +80,7 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                                             return const CircularProgressIndicator();
                                           } else {
                                             return TextButton(
+                                                key: Key(TDKey.editTextButton),
                                                 onPressed: () async {
                                                   _store?.dispatch(
                                                       UpdateItemAction(
@@ -107,6 +110,7 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                                       )
                                     ],
                                     content: TextField(
+                                        key: Key(TDKey.editTextfield),
                                         controller: _controller
                                           ..text = item.title.toString()),
                                   );
