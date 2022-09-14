@@ -51,7 +51,9 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                               (b) => b.item = item.toBuilder()));
                         },
                         child: ListTile(
-                          title: Text(item.title ?? ""),
+                          title: Text(item.title ?? "",
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
                           onTap: () async {
                             await showDialog(
                                 context: context,

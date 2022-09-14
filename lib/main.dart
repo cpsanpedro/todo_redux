@@ -6,6 +6,7 @@ import 'package:todo_redux/model/model.dart';
 import 'package:todo_redux/redux/actions.dart';
 import 'package:todo_redux/shared/store.dart';
 
+import 'gen/assets.gen.dart';
 import 'view_model/view_model.dart';
 import 'widget/add_item.dart';
 import 'widget/todo_list.dart';
@@ -50,6 +51,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset(Assets.images.target.path, color: Colors.white),
+        ),
         title: Text(widget.title),
       ),
       body: StoreConnector<AppState, ToDoViewModel>(
@@ -58,15 +63,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 ..items = ListBuilder(store.state.items!)
                 ..isLoading = false),
           builder: (BuildContext context, ToDoViewModel viewModel) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  AddItemWidget(model: viewModel),
-                  TodoListWidget(model: viewModel)
-                ],
-              ),
+            return Stack(
+              children: [
+                Positioned(
+                    bottom: -100.0,
+                    child: Opacity(
+                        opacity: 0.1,
+                        child: Image.asset(Assets.images.list.path))),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      AddItemWidget(model: viewModel),
+                      TodoListWidget(model: viewModel),
+                    ],
+                  ),
+                ),
+              ],
             );
           }),
     );
