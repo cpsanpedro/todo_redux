@@ -1,0 +1,8 @@
+{
+  "@@locale" : "vi",
+
+  "todoList" : "Những việc cần làm",
+  "@todoList" : {
+    "description" : "App Function"
+  }
+}

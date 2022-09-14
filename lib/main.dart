@@ -1,5 +1,6 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:todo_redux/model/model.dart';
@@ -24,14 +25,16 @@ class MyApp extends StatelessWidget {
     return StoreProvider<AppState>(
       store: store,
       child: MaterialApp(
-        title: 'Flutter Demo',
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        title: 'To-Do List',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
         home: StoreBuilder<AppState>(
             onInit: (store) => store.dispatch(GetItemsAction()),
             builder: (context, store) {
-              return const MyHomePage(title: 'To-Do List');
+              return MyHomePage(title: AppLocalizations.of(context)!.todoList);
             }),
       ),
     );
