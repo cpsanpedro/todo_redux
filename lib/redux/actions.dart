@@ -35,6 +35,16 @@ abstract class DeleteItemAction
       _$DeleteItemAction;
 }
 
+abstract class SuccessDeleteItemAction
+    implements Built<SuccessDeleteItemAction, SuccessDeleteItemActionBuilder> {
+  ToDoItem get item;
+  SuccessDeleteItemAction._();
+
+  factory SuccessDeleteItemAction(
+          [void Function(SuccessDeleteItemActionBuilder) updates]) =
+      _$SuccessDeleteItemAction;
+}
+
 class GetItemsAction {}
 
 abstract class LoadedItemsAction

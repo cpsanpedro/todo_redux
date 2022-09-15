@@ -1,4 +1,3 @@
-import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
@@ -33,7 +32,7 @@ class _TodoListWidgetState extends State<TodoListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.model.items != null
+    return widget.model.items != null && widget.model.isLoading == false
         ? Expanded(
             child: ListView(
                 children: widget.model.items!
@@ -46,9 +45,11 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                               child: Icon(Icons.delete, color: Colors.white),
                             )),
                         key: Key(item.id.toString()),
-                        onDismissed: (direction) {
+                        onDismissed: (direction) {},
+                        confirmDismiss: (val) async {
                           _store?.dispatch(DeleteItemAction(
                               (b) => b.item = item.toBuilder()));
+                          return true;
                         },
                         child: ListTile(
                           title: Text(item.title ?? "",
@@ -65,51 +66,18 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                                           onPressed: () =>
                                               Navigator.pop(context),
                                           child: Text("Cancel")),
-                                      StoreConnector<AppState, ToDoViewModel>(
-                                        converter: (store) => ToDoViewModel(
-                                            (b) => b
-                                              ..items = ListBuilder(
-                                                  store.state.items!)
-                                              ..isLoading =
-                                                  store.state.isLoading),
-                                        distinct: true,
-                                        builder: (context, viewModel) {
-                                          print(
-                                              "IS LOOADING ${viewModel.isLoading}");
-                                          final isLoading =
-                                              viewModel.isLoading ?? false;
-                                          if (isLoading) {
-                                            return const CircularProgressIndicator();
-                                          } else {
-                                            return TextButton(
-                                                key: Key(TDKey.editTextButton),
-                                                onPressed: () async {
-                                                  _store?.dispatch(
-                                                      UpdateItemAction(
-                                                          (b) => b.item
-                                                            ..title =
-                                                                _controller.text
-                                                            ..id = item.id));
-                                                  await Future.delayed(
-                                                      const Duration(
-                                                          seconds: 1));
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text("Edit"));
-                                          }
-                                          // return ToDoViewModel(
-                                          //   child: TextButton(
-                                          //       onPressed: () {
-                                          //         _store?.dispatch(
-                                          //             UpdateItemAction((b) => b.item
-                                          //               ..title = _controller.text
-                                          //               ..id = item.id));
-                                          //         Navigator.pop(context);
-                                          //       },
-                                          //       child: Text("Edit")),
-                                          // );
-                                        },
-                                      )
+                                      TextButton(
+                                          key: Key(TDKey.editTextButton),
+                                          onPressed: () async {
+                                            _store?.dispatch(
+                                                UpdateItemAction((b) => b.item
+                                                  ..title = _controller.text
+                                                  ..id = item.id));
+                                            await Future.delayed(
+                                                const Duration(seconds: 1));
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text("Edit")),
                                     ],
                                     content: TextField(
                                         key: Key(TDKey.editTextfield),
@@ -121,6 +89,9 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                         )))
                     .toList()),
           )
-        : Container();
+        : const Padding(
+            padding: EdgeInsets.only(top: 32.0),
+            child: CircularProgressIndicator(),
+          );
   }
 }

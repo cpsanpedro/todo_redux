@@ -6,7 +6,7 @@ import '../model/model.dart';
 
 final Reducer<AppState> appReducer = combineReducers<AppState>([
   TypedReducer<AppState, SuccessAddItemAction>(addItemReducer),
-  TypedReducer<AppState, DeleteItemAction>(deleteItemReducer),
+  TypedReducer<AppState, SuccessDeleteItemAction>(deleteItemReducer),
   TypedReducer<AppState, LoadedItemsAction>(loadedItemReducer),
   TypedReducer<AppState, UpdateItemAction>(updateItemReducer),
   TypedReducer<AppState, LoadingAction>(loadingReducer)
@@ -22,7 +22,7 @@ AppState addItemReducer(AppState state, SuccessAddItemAction action) {
     ]));
 }
 
-AppState deleteItemReducer(AppState state, DeleteItemAction action) {
+AppState deleteItemReducer(AppState state, SuccessDeleteItemAction action) {
   return AppState((builder) {
     ListBuilder<ToDoItem> list = state.toBuilder().items;
     list.remove(action.item);

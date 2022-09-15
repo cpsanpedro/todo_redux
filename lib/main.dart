@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
           converter: (Store<AppState> store) =>
               ToDoViewModel((builder) => builder
                 ..items = ListBuilder(store.state.items!)
-                ..isLoading = false),
+                ..isLoading = store.state.isLoading ?? false),
           builder: (BuildContext context, ToDoViewModel viewModel) {
             return Stack(
               children: [
