@@ -5,20 +5,20 @@ import 'package:todo_redux/redux/actions.dart';
 import '../model/model.dart';
 
 final Reducer<AppState> appReducer = combineReducers<AppState>([
-  TypedReducer<AppState, AddItemAction>(addItemReducer),
+  TypedReducer<AppState, SuccessAddItemAction>(addItemReducer),
   TypedReducer<AppState, DeleteItemAction>(deleteItemReducer),
   TypedReducer<AppState, LoadedItemsAction>(loadedItemReducer),
   TypedReducer<AppState, UpdateItemAction>(updateItemReducer),
   TypedReducer<AppState, LoadingAction>(loadingReducer)
 ]);
 
-AppState addItemReducer(AppState state, AddItemAction action) {
+AppState addItemReducer(AppState state, SuccessAddItemAction action) {
   return AppState((builder) => builder
     ..items = ListBuilder<ToDoItem>([
       ...?state.items,
       ToDoItem((b) => b
-        ..title = action.title
-        ..id = action.id)
+        ..title = action.item.title
+        ..id = action.item.id)
     ]));
 }
 
