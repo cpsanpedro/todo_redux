@@ -89,6 +89,100 @@ class AddItemActionBuilder
   }
 }
 
+class _$SuccessAddItemAction extends SuccessAddItemAction {
+  @override
+  final ToDoItem item;
+
+  factory _$SuccessAddItemAction(
+          [void Function(SuccessAddItemActionBuilder)? updates]) =>
+      (new SuccessAddItemActionBuilder()..update(updates))._build();
+
+  _$SuccessAddItemAction._({required this.item}) : super._() {
+    BuiltValueNullFieldError.checkNotNull(
+        item, r'SuccessAddItemAction', 'item');
+  }
+
+  @override
+  SuccessAddItemAction rebuild(
+          void Function(SuccessAddItemActionBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  SuccessAddItemActionBuilder toBuilder() =>
+      new SuccessAddItemActionBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is SuccessAddItemAction && item == other.item;
+  }
+
+  @override
+  int get hashCode {
+    return $jf($jc(0, item.hashCode));
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'SuccessAddItemAction')
+          ..add('item', item))
+        .toString();
+  }
+}
+
+class SuccessAddItemActionBuilder
+    implements Builder<SuccessAddItemAction, SuccessAddItemActionBuilder> {
+  _$SuccessAddItemAction? _$v;
+
+  ToDoItemBuilder? _item;
+  ToDoItemBuilder get item => _$this._item ??= new ToDoItemBuilder();
+  set item(ToDoItemBuilder? item) => _$this._item = item;
+
+  SuccessAddItemActionBuilder();
+
+  SuccessAddItemActionBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _item = $v.item.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(SuccessAddItemAction other) {
+    ArgumentError.checkNotNull(other, 'other');
+    _$v = other as _$SuccessAddItemAction;
+  }
+
+  @override
+  void update(void Function(SuccessAddItemActionBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  SuccessAddItemAction build() => _build();
+
+  _$SuccessAddItemAction _build() {
+    _$SuccessAddItemAction _$result;
+    try {
+      _$result = _$v ?? new _$SuccessAddItemAction._(item: item.build());
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'item';
+        item.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            r'SuccessAddItemAction', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
 class _$DeleteItemAction extends DeleteItemAction {
   @override
   final ToDoItem item;

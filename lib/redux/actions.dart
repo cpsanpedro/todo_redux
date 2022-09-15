@@ -15,6 +15,17 @@ abstract class AddItemAction
       _$AddItemAction;
 }
 
+abstract class SuccessAddItemAction
+    implements Built<SuccessAddItemAction, SuccessAddItemActionBuilder> {
+  ToDoItem get item;
+
+  SuccessAddItemAction._();
+
+  factory SuccessAddItemAction(
+          [void Function(SuccessAddItemActionBuilder) updates]) =
+      _$SuccessAddItemAction;
+}
+
 abstract class DeleteItemAction
     implements Built<DeleteItemAction, DeleteItemActionBuilder> {
   ToDoItem get item;
