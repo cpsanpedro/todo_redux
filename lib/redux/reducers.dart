@@ -8,7 +8,7 @@ final Reducer<AppState> appReducer = combineReducers<AppState>([
   TypedReducer<AppState, SuccessAddItemAction>(addItemReducer),
   TypedReducer<AppState, SuccessDeleteItemAction>(deleteItemReducer),
   TypedReducer<AppState, LoadedItemsAction>(loadedItemReducer),
-  TypedReducer<AppState, UpdateItemAction>(updateItemReducer),
+  TypedReducer<AppState, SuccessUpdateItemAction>(updateItemReducer),
   TypedReducer<AppState, LoadingAction>(loadingReducer)
 ]);
 
@@ -36,13 +36,10 @@ AppState loadedItemReducer(AppState state, LoadedItemsAction action) {
     ..isLoading = false);
 }
 
-AppState updateItemReducer(AppState state, UpdateItemAction action) {
-  print("ACTION UPDATE ${action.item}");
+AppState updateItemReducer(AppState state, SuccessUpdateItemAction action) {
   return AppState((builder) {
     ListBuilder<ToDoItem> list = state.toBuilder().items;
-    print("STATE UPDATE ${state.toBuilder().items.length}");
     list.map((p0) {
-      print("HERE ${p0}");
       if (p0.id == action.item.id) {
         p0 = ToDoItem((b) => b
           ..title = action.item.title
@@ -51,7 +48,6 @@ AppState updateItemReducer(AppState state, UpdateItemAction action) {
       return p0;
     });
     builder.items = list;
-    builder.isLoading = true;
   });
 }
 

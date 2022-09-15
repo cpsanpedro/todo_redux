@@ -65,6 +65,16 @@ abstract class UpdateItemAction
       _$UpdateItemAction;
 }
 
+abstract class SuccessUpdateItemAction
+    implements Built<SuccessUpdateItemAction, SuccessUpdateItemActionBuilder> {
+  ToDoItem get item;
+  SuccessUpdateItemAction._();
+
+  factory SuccessUpdateItemAction(
+          [void Function(SuccessUpdateItemActionBuilder) updates]) =
+      _$SuccessUpdateItemAction;
+}
+
 abstract class LoadingAction
     implements Built<LoadingAction, LoadingActionBuilder> {
   bool? get isLoading;

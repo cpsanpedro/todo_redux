@@ -553,6 +553,101 @@ class UpdateItemActionBuilder
   }
 }
 
+class _$SuccessUpdateItemAction extends SuccessUpdateItemAction {
+  @override
+  final ToDoItem item;
+
+  factory _$SuccessUpdateItemAction(
+          [void Function(SuccessUpdateItemActionBuilder)? updates]) =>
+      (new SuccessUpdateItemActionBuilder()..update(updates))._build();
+
+  _$SuccessUpdateItemAction._({required this.item}) : super._() {
+    BuiltValueNullFieldError.checkNotNull(
+        item, r'SuccessUpdateItemAction', 'item');
+  }
+
+  @override
+  SuccessUpdateItemAction rebuild(
+          void Function(SuccessUpdateItemActionBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  SuccessUpdateItemActionBuilder toBuilder() =>
+      new SuccessUpdateItemActionBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is SuccessUpdateItemAction && item == other.item;
+  }
+
+  @override
+  int get hashCode {
+    return $jf($jc(0, item.hashCode));
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'SuccessUpdateItemAction')
+          ..add('item', item))
+        .toString();
+  }
+}
+
+class SuccessUpdateItemActionBuilder
+    implements
+        Builder<SuccessUpdateItemAction, SuccessUpdateItemActionBuilder> {
+  _$SuccessUpdateItemAction? _$v;
+
+  ToDoItemBuilder? _item;
+  ToDoItemBuilder get item => _$this._item ??= new ToDoItemBuilder();
+  set item(ToDoItemBuilder? item) => _$this._item = item;
+
+  SuccessUpdateItemActionBuilder();
+
+  SuccessUpdateItemActionBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _item = $v.item.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(SuccessUpdateItemAction other) {
+    ArgumentError.checkNotNull(other, 'other');
+    _$v = other as _$SuccessUpdateItemAction;
+  }
+
+  @override
+  void update(void Function(SuccessUpdateItemActionBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  SuccessUpdateItemAction build() => _build();
+
+  _$SuccessUpdateItemAction _build() {
+    _$SuccessUpdateItemAction _$result;
+    try {
+      _$result = _$v ?? new _$SuccessUpdateItemAction._(item: item.build());
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'item';
+        item.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            r'SuccessUpdateItemAction', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
 class _$LoadingAction extends LoadingAction {
   @override
   final bool? isLoading;

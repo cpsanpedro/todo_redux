@@ -73,8 +73,6 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                                                 UpdateItemAction((b) => b.item
                                                   ..title = _controller.text
                                                   ..id = item.id));
-                                            await Future.delayed(
-                                                const Duration(seconds: 1));
                                             Navigator.pop(context);
                                           },
                                           child: Text("Edit")),

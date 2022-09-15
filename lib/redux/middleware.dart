@@ -12,7 +12,7 @@ class AppMiddleware extends EpicClass<AppState> {
   @override
   Stream call(Stream actions, EpicStore<AppState> store) {
     return combineEpics<AppState>(
-      [saveEpic, getEpic, loadingEpic, addEpic, deleteEpic],
+      [updateEpic, getEpic, loadingEpic, addEpic, deleteEpic],
     )(actions, store);
   }
 
@@ -29,7 +29,7 @@ class AppMiddleware extends EpicClass<AppState> {
     }
   }
 
-  Stream<dynamic> saveEpic(
+  Stream<dynamic> updateEpic(
       Stream<dynamic> actions, EpicStore<AppState> store) async* {
     await for (final action in actions) {
       if (action is UpdateItemAction) {
@@ -37,6 +37,7 @@ class AppMiddleware extends EpicClass<AppState> {
         await Future.delayed(const Duration(seconds: 1));
         await todoRepo.saveTodos(store.state);
         yield LoadingAction((b) => b.isLoading = false);
+        yield SuccessUpdateItemAction((b) => b.item = action.item.toBuilder());
       }
     }
   }
