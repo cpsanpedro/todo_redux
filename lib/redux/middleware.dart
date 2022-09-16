@@ -20,11 +20,9 @@ class AppMiddleware extends EpicClass<AppState> {
       Stream<dynamic> actions, EpicStore<AppState> store) async* {
     await for (final action in actions) {
       if (action is GetItemsAction) {
-        final todos = await todoRepo.getTodos();
-        yield LoadedItemsAction((b) => b.items = todos?.items != null
-            ? ListBuilder<ToDoItem>(todos!.items!)
-            : ListBuilder());
-        // yield FinishLoadingAction();
+        List<ToDoItem>? todos = await todoRepo.getTodos();
+        yield LoadedItemsAction((b) => b.items =
+            todos != null ? ListBuilder<ToDoItem>(todos) : ListBuilder());
       }
     }
   }
@@ -35,7 +33,9 @@ class AppMiddleware extends EpicClass<AppState> {
       if (action is UpdateItemAction) {
         yield LoadingAction((b) => b.isLoading = true);
         await Future.delayed(const Duration(seconds: 1));
-        await todoRepo.saveTodos(store.state);
+        await todoRepo.updateTodo(ToDoItem((b) => b
+          ..id = action.item.id
+          ..title = action.item.title));
         yield LoadingAction((b) => b.isLoading = false);
         yield SuccessUpdateItemAction((b) => b.item = action.item.toBuilder());
       }
@@ -46,7 +46,9 @@ class AppMiddleware extends EpicClass<AppState> {
       Stream<dynamic> actions, EpicStore<AppState> store) async* {
     await for (final action in actions) {
       if (action is AddItemAction) {
-        await todoRepo.saveTodos(store.state);
+        await todoRepo.saveTodos(ToDoItem((b) => b
+          ..id = action.id
+          ..title = action.title));
         yield SuccessAddItemAction((b) => b.item
           ..title = action.title
           ..id = action.id);
@@ -60,7 +62,9 @@ class AppMiddleware extends EpicClass<AppState> {
       if (action is DeleteItemAction) {
         yield LoadingAction((b) => b.isLoading = true);
         await Future.delayed(const Duration(seconds: 1));
-        await todoRepo.saveTodos(store.state);
+        await todoRepo.deleteTodo(ToDoItem((b) => b
+          ..id = action.item.id
+          ..title = action.item.title));
         yield LoadingAction((b) => b.isLoading = false);
         yield SuccessDeleteItemAction((b) => b.item = action.item.toBuilder());
       }
