@@ -2,6 +2,8 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:todo_redux/model/model.dart';
 
+import '../model/status.dart';
+
 part 'actions.g.dart';
 
 abstract class AddItemAction
@@ -50,6 +52,7 @@ class GetItemsAction {}
 abstract class LoadedItemsAction
     implements Built<LoadedItemsAction, LoadedItemsActionBuilder> {
   BuiltList<ToDoItem> get items;
+  Status get status;
   LoadedItemsAction._();
 
   factory LoadedItemsAction([void Function(LoadedItemsActionBuilder) updates]) =
@@ -75,9 +78,19 @@ abstract class SuccessUpdateItemAction
       _$SuccessUpdateItemAction;
 }
 
+abstract class ErrorUpdateItemAction
+    implements Built<ErrorUpdateItemAction, ErrorUpdateItemActionBuilder> {
+  String get error;
+  ErrorUpdateItemAction._();
+
+  factory ErrorUpdateItemAction(
+          [void Function(ErrorUpdateItemActionBuilder) updates]) =
+      _$ErrorUpdateItemAction;
+}
+
 abstract class LoadingAction
     implements Built<LoadingAction, LoadingActionBuilder> {
-  bool? get isLoading;
+  Status? get status;
   LoadingAction._();
 
   factory LoadingAction([void Function(LoadingActionBuilder) updates]) =

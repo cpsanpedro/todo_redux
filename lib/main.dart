@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:todo_redux/model/model.dart';
-import 'package:todo_redux/redux/actions.dart';
 import 'package:todo_redux/shared/store.dart';
 
 import 'gen/assets.gen.dart';
+import 'model/model.dart';
+import 'model/status.dart';
+import 'redux/actions.dart';
 import 'view_model/view_model.dart';
 import 'widget/add_item.dart';
 import 'widget/todo_list.dart';
@@ -64,7 +65,17 @@ class _MyHomePageState extends State<MyHomePage> {
           converter: (Store<AppState> store) =>
               ToDoViewModel((builder) => builder
                 ..items = ListBuilder(store.state.items!)
-                ..isLoading = store.state.isLoading ?? false),
+                ..status = store.state.status?.toBuilder()),
+          onDidChange: (vm, model) {
+            print("MODEL ${model.status}");
+
+            if (model.status == Status.error(message: model.status?.message) ||
+                model.status == Status.success()) {
+              print("STATUS MAIN ${model.status}");
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(model.status?.message ?? "")));
+            }
+          },
           builder: (BuildContext context, ToDoViewModel viewModel) {
             return Stack(
               children: [

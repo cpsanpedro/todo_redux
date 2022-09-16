@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
+import 'package:todo_redux/model/status.dart';
 
 import 'serializer.dart';
 
@@ -11,7 +12,7 @@ part 'model.g.dart';
 abstract class AppState implements Built<AppState, AppStateBuilder> {
   AppState._();
   BuiltList<ToDoItem>? get items;
-  bool? get isLoading;
+  Status? get status;
 
   factory AppState.init() {
     return AppState(

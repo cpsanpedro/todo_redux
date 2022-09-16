@@ -6,13 +6,14 @@ import 'package:built_value/serializer.dart';
 
 import '../model/model.dart';
 import '../model/serializer.dart';
+import '../model/status.dart';
 
 part 'view_model.g.dart';
 
 abstract class ToDoViewModel
     implements Built<ToDoViewModel, ToDoViewModelBuilder> {
   BuiltList<ToDoItem>? get items;
-  bool? get isLoading;
+  Status? get status;
 
   ToDoViewModel._();
 

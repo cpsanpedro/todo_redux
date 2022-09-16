@@ -6,6 +6,7 @@ import 'package:todo_redux/redux/actions.dart';
 import 'package:todo_redux/view_model/view_model.dart';
 
 import '../model/model.dart';
+import '../model/status.dart';
 
 class TodoListWidget extends StatefulWidget {
   const TodoListWidget({required this.model, Key? key}) : super(key: key);
@@ -32,7 +33,7 @@ class _TodoListWidgetState extends State<TodoListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.model.items != null && widget.model.isLoading == false
+    return widget.model.items != null && widget.model.status != Status.loading()
         ? Expanded(
             child: ListView(
                 children: widget.model.items!

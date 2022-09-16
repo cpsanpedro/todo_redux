@@ -372,13 +372,18 @@ class SuccessDeleteItemActionBuilder
 class _$LoadedItemsAction extends LoadedItemsAction {
   @override
   final BuiltList<ToDoItem> items;
+  @override
+  final Status status;
 
   factory _$LoadedItemsAction(
           [void Function(LoadedItemsActionBuilder)? updates]) =>
       (new LoadedItemsActionBuilder()..update(updates))._build();
 
-  _$LoadedItemsAction._({required this.items}) : super._() {
+  _$LoadedItemsAction._({required this.items, required this.status})
+      : super._() {
     BuiltValueNullFieldError.checkNotNull(items, r'LoadedItemsAction', 'items');
+    BuiltValueNullFieldError.checkNotNull(
+        status, r'LoadedItemsAction', 'status');
   }
 
   @override
@@ -392,18 +397,21 @@ class _$LoadedItemsAction extends LoadedItemsAction {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is LoadedItemsAction && items == other.items;
+    return other is LoadedItemsAction &&
+        items == other.items &&
+        status == other.status;
   }
 
   @override
   int get hashCode {
-    return $jf($jc(0, items.hashCode));
+    return $jf($jc($jc(0, items.hashCode), status.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'LoadedItemsAction')
-          ..add('items', items))
+          ..add('items', items)
+          ..add('status', status))
         .toString();
   }
 }
@@ -417,12 +425,17 @@ class LoadedItemsActionBuilder
       _$this._items ??= new ListBuilder<ToDoItem>();
   set items(ListBuilder<ToDoItem>? items) => _$this._items = items;
 
+  StatusBuilder? _status;
+  StatusBuilder get status => _$this._status ??= new StatusBuilder();
+  set status(StatusBuilder? status) => _$this._status = status;
+
   LoadedItemsActionBuilder();
 
   LoadedItemsActionBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _items = $v.items.toBuilder();
+      _status = $v.status.toBuilder();
       _$v = null;
     }
     return this;
@@ -445,12 +458,16 @@ class LoadedItemsActionBuilder
   _$LoadedItemsAction _build() {
     _$LoadedItemsAction _$result;
     try {
-      _$result = _$v ?? new _$LoadedItemsAction._(items: items.build());
+      _$result = _$v ??
+          new _$LoadedItemsAction._(
+              items: items.build(), status: status.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'items';
         items.build();
+        _$failedField = 'status';
+        status.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             r'LoadedItemsAction', _$failedField, e.toString());
@@ -648,14 +665,98 @@ class SuccessUpdateItemActionBuilder
   }
 }
 
+class _$ErrorUpdateItemAction extends ErrorUpdateItemAction {
+  @override
+  final String error;
+
+  factory _$ErrorUpdateItemAction(
+          [void Function(ErrorUpdateItemActionBuilder)? updates]) =>
+      (new ErrorUpdateItemActionBuilder()..update(updates))._build();
+
+  _$ErrorUpdateItemAction._({required this.error}) : super._() {
+    BuiltValueNullFieldError.checkNotNull(
+        error, r'ErrorUpdateItemAction', 'error');
+  }
+
+  @override
+  ErrorUpdateItemAction rebuild(
+          void Function(ErrorUpdateItemActionBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  ErrorUpdateItemActionBuilder toBuilder() =>
+      new ErrorUpdateItemActionBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is ErrorUpdateItemAction && error == other.error;
+  }
+
+  @override
+  int get hashCode {
+    return $jf($jc(0, error.hashCode));
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'ErrorUpdateItemAction')
+          ..add('error', error))
+        .toString();
+  }
+}
+
+class ErrorUpdateItemActionBuilder
+    implements Builder<ErrorUpdateItemAction, ErrorUpdateItemActionBuilder> {
+  _$ErrorUpdateItemAction? _$v;
+
+  String? _error;
+  String? get error => _$this._error;
+  set error(String? error) => _$this._error = error;
+
+  ErrorUpdateItemActionBuilder();
+
+  ErrorUpdateItemActionBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _error = $v.error;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(ErrorUpdateItemAction other) {
+    ArgumentError.checkNotNull(other, 'other');
+    _$v = other as _$ErrorUpdateItemAction;
+  }
+
+  @override
+  void update(void Function(ErrorUpdateItemActionBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  ErrorUpdateItemAction build() => _build();
+
+  _$ErrorUpdateItemAction _build() {
+    final _$result = _$v ??
+        new _$ErrorUpdateItemAction._(
+            error: BuiltValueNullFieldError.checkNotNull(
+                error, r'ErrorUpdateItemAction', 'error'));
+    replace(_$result);
+    return _$result;
+  }
+}
+
 class _$LoadingAction extends LoadingAction {
   @override
-  final bool? isLoading;
+  final Status? status;
 
   factory _$LoadingAction([void Function(LoadingActionBuilder)? updates]) =>
       (new LoadingActionBuilder()..update(updates))._build();
 
-  _$LoadingAction._({this.isLoading}) : super._();
+  _$LoadingAction._({this.status}) : super._();
 
   @override
   LoadingAction rebuild(void Function(LoadingActionBuilder) updates) =>
@@ -667,18 +768,18 @@ class _$LoadingAction extends LoadingAction {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is LoadingAction && isLoading == other.isLoading;
+    return other is LoadingAction && status == other.status;
   }
 
   @override
   int get hashCode {
-    return $jf($jc(0, isLoading.hashCode));
+    return $jf($jc(0, status.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'LoadingAction')
-          ..add('isLoading', isLoading))
+          ..add('status', status))
         .toString();
   }
 }
@@ -687,16 +788,16 @@ class LoadingActionBuilder
     implements Builder<LoadingAction, LoadingActionBuilder> {
   _$LoadingAction? _$v;
 
-  bool? _isLoading;
-  bool? get isLoading => _$this._isLoading;
-  set isLoading(bool? isLoading) => _$this._isLoading = isLoading;
+  StatusBuilder? _status;
+  StatusBuilder get status => _$this._status ??= new StatusBuilder();
+  set status(StatusBuilder? status) => _$this._status = status;
 
   LoadingActionBuilder();
 
   LoadingActionBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _isLoading = $v.isLoading;
+      _status = $v.status?.toBuilder();
       _$v = null;
     }
     return this;
@@ -717,7 +818,20 @@ class LoadingActionBuilder
   LoadingAction build() => _build();
 
   _$LoadingAction _build() {
-    final _$result = _$v ?? new _$LoadingAction._(isLoading: isLoading);
+    _$LoadingAction _$result;
+    try {
+      _$result = _$v ?? new _$LoadingAction._(status: _status?.build());
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'status';
+        _status?.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            r'LoadingAction', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

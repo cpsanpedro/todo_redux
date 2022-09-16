@@ -28,12 +28,12 @@ class _$AppStateSerializer implements StructuredSerializer<AppState> {
             specifiedType:
                 const FullType(BuiltList, const [const FullType(ToDoItem)])));
     }
-    value = object.isLoading;
+    value = object.status;
     if (value != null) {
       result
-        ..add('isLoading')
-        ..add(
-            serializers.serialize(value, specifiedType: const FullType(bool)));
+        ..add('status')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(Status)));
     }
     return result;
   }
@@ -55,9 +55,9 @@ class _$AppStateSerializer implements StructuredSerializer<AppState> {
                       BuiltList, const [const FullType(ToDoItem)]))!
               as BuiltList<Object?>);
           break;
-        case 'isLoading':
-          result.isLoading = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool?;
+        case 'status':
+          result.status.replace(serializers.deserialize(value,
+              specifiedType: const FullType(Status))! as Status);
           break;
       }
     }
@@ -124,12 +124,12 @@ class _$AppState extends AppState {
   @override
   final BuiltList<ToDoItem>? items;
   @override
-  final bool? isLoading;
+  final Status? status;
 
   factory _$AppState([void Function(AppStateBuilder)? updates]) =>
       (new AppStateBuilder()..update(updates))._build();
 
-  _$AppState._({this.items, this.isLoading}) : super._();
+  _$AppState._({this.items, this.status}) : super._();
 
   @override
   AppState rebuild(void Function(AppStateBuilder) updates) =>
@@ -141,21 +141,19 @@ class _$AppState extends AppState {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is AppState &&
-        items == other.items &&
-        isLoading == other.isLoading;
+    return other is AppState && items == other.items && status == other.status;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, items.hashCode), isLoading.hashCode));
+    return $jf($jc($jc(0, items.hashCode), status.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'AppState')
           ..add('items', items)
-          ..add('isLoading', isLoading))
+          ..add('status', status))
         .toString();
   }
 }
@@ -168,9 +166,9 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
       _$this._items ??= new ListBuilder<ToDoItem>();
   set items(ListBuilder<ToDoItem>? items) => _$this._items = items;
 
-  bool? _isLoading;
-  bool? get isLoading => _$this._isLoading;
-  set isLoading(bool? isLoading) => _$this._isLoading = isLoading;
+  StatusBuilder? _status;
+  StatusBuilder get status => _$this._status ??= new StatusBuilder();
+  set status(StatusBuilder? status) => _$this._status = status;
 
   AppStateBuilder();
 
@@ -178,7 +176,7 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
     final $v = _$v;
     if ($v != null) {
       _items = $v.items?.toBuilder();
-      _isLoading = $v.isLoading;
+      _status = $v.status?.toBuilder();
       _$v = null;
     }
     return this;
@@ -201,13 +199,15 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
   _$AppState _build() {
     _$AppState _$result;
     try {
-      _$result =
-          _$v ?? new _$AppState._(items: _items?.build(), isLoading: isLoading);
+      _$result = _$v ??
+          new _$AppState._(items: _items?.build(), status: _status?.build());
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'items';
         _items?.build();
+        _$failedField = 'status';
+        _status?.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             r'AppState', _$failedField, e.toString());

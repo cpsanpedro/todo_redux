@@ -54,6 +54,7 @@ class Api {
     parsedTodos[index] = item;
     Map<String, List<ToDoItem>> newMap = {"items": parsedTodos};
 
+    // return false;
     return prefs.setString("items", jsonEncode(newMap));
   }
 
