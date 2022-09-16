@@ -13,21 +13,24 @@ void main() {
   });
 
   test('add one todo', () {
-    store.dispatch(AddItemAction((b) => b
-      ..id = mockToDoItem.id
-      ..title = mockToDoItem.title));
-    expect(store.state, mockTodo());
+    final newState = appReducer(store.state,
+        SuccessAddItemAction((b) => b.item = mockToDoItem.toBuilder()));
+    expect(newState, mockTodoState());
   });
 
   test('update one todo', () {
-    store.dispatch(
-        UpdateItemAction((b) => b.item = updatedMockToDoItem.toBuilder()));
-    expect(store.state, updatedMockTodo());
+    final state = mockTodoState();
+    final newState = appReducer(
+        state,
+        SuccessUpdateItemAction(
+            (b) => b.item = updatedMockToDoItem.toBuilder()));
+    expect(newState, updatedMockTodoState());
   });
 
-  // test('delete one todo', () {
-  //   store.dispatch(
-  //       DeleteItemAction((b) => b.item = updatedMockToDoItem.toBuilder()));
-  //   expect(store.state, AppState.init());
-  // });
+  test('delete one todo', () {
+    final state = mockTodoState();
+    final newState = appReducer(state,
+        SuccessDeleteItemAction((b) => b..item = mockToDoItem.toBuilder()));
+    expect(newState, AppState.init());
+  });
 }

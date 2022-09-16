@@ -15,21 +15,21 @@ ToDoItem get anotherMockToDoItem => ToDoItem((item) => item
   ..id = "2"
   ..title = "Item 2");
 
-AppState mockTodo() {
+AppState mockTodoState() {
   return AppState((b) => b..items = ListBuilder<ToDoItem>([mockToDoItem]));
 }
 
-AppState updatedMockTodo() {
+AppState updatedMockTodoState() {
   return AppState(
       (b) => b..items = ListBuilder<ToDoItem>([updatedMockToDoItem]));
 }
 
-AppState anotherMockTodo() {
+AppState anotherMockTodoState() {
   return AppState(
       (b) => b..items = ListBuilder<ToDoItem>([anotherMockToDoItem]));
 }
 
-AppState mockTodos() {
+AppState mockTodosState() {
   return AppState((b) =>
       b..items = ListBuilder<ToDoItem>([mockToDoItem, anotherMockToDoItem]));
 }

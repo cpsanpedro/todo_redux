@@ -14,18 +14,15 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   bool? get isLoading;
 
   factory AppState.init() {
-    return AppState((builder) => builder
-      ..items = <ToDoItem>[].build().toBuilder()
-      ..isLoading = false);
+    return AppState(
+        (builder) => builder..items = <ToDoItem>[].build().toBuilder());
   }
 
   factory AppState.fromJson(Map json) {
     return AppState((builder) {
-      builder
-        ..items = ListBuilder<ToDoItem>((json["items"]).map((i) {
-          return ToDoItem.fromJson(jsonEncode(i));
-        }).toList())
-        ..isLoading = false;
+      builder.items = ListBuilder<ToDoItem>((json["items"]).map((i) {
+        return ToDoItem.fromJson(jsonEncode(i));
+      }).toList());
     });
   }
 
