@@ -23,15 +23,17 @@ class AppMiddleware extends EpicClass<AppState> {
       if (action is GetItemsAction) {
         List<ToDoItem>? todos = [];
         try {
+          await Future.delayed(const Duration(seconds: 1));
           todos = await todoRepo.getTodos();
-          print("ET TODO ${todos}");
+          yield LoadedItemsAction((b) => b
+            ..items =
+                todos != null ? ListBuilder<ToDoItem>(todos) : ListBuilder()
+            ..status = Status.idle().toBuilder());
         } catch (e) {
           print("E GET TODO ${e.toString()}");
+          yield LoadingAction((b) =>
+              b.status = Status.error(message: e.toString()).toBuilder());
         }
-
-        yield LoadedItemsAction((b) => b
-          ..items = todos != null ? ListBuilder<ToDoItem>(todos) : ListBuilder()
-          ..status = Status.idle().toBuilder());
       }
     }
   }
@@ -52,8 +54,8 @@ class AppMiddleware extends EpicClass<AppState> {
           yield LoadingAction((b) =>
               b.status = Status.success(message: "ToDo Updated").toBuilder());
         } else {
-          yield LoadingAction(
-              (b) => b.status = Status.error(message: "Error").toBuilder());
+          yield LoadingAction((b) => b.status =
+              Status.error(message: "Error updating ToDo").toBuilder());
         }
       }
     }
@@ -63,12 +65,23 @@ class AppMiddleware extends EpicClass<AppState> {
       Stream<dynamic> actions, EpicStore<AppState> store) async* {
     await for (final action in actions) {
       if (action is AddItemAction) {
-        await todoRepo.saveTodos(ToDoItem((b) => b
-          ..id = action.id
-          ..title = action.title));
-        yield SuccessAddItemAction((b) => b.item
-          ..title = action.title
-          ..id = action.id);
+        yield LoadingAction((b) => b.status = Status.loading().toBuilder());
+        await Future.delayed(const Duration(seconds: 1));
+        bool addResult = await todoRepo.saveTodos(ToDoItem((b) => b
+              ..id = action.id
+              ..title = action.title)) ??
+            false;
+        if (addResult) {
+          yield SuccessAddItemAction((b) => b.item
+            ..title = action.title
+            ..id = action.id);
+          yield LoadingAction((b) => b.status =
+              Status.success(message: "ToDo Added - ${action.title}")
+                  .toBuilder());
+        } else {
+          yield LoadingAction((b) => b.status =
+              Status.error(message: "Error Adding ToDo").toBuilder());
+        }
       }
     }
   }

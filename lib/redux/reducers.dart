@@ -31,9 +31,7 @@ AppState deleteItemReducer(AppState state, SuccessDeleteItemAction action) {
 }
 
 AppState loadedItemReducer(AppState state, LoadedItemsAction action) {
-  return AppState((builder) => builder
-    ..items = action.items.toBuilder()
-    ..status = action.status.toBuilder());
+  return AppState((builder) => builder..items = action.items.toBuilder());
 }
 
 AppState updateItemReducer(AppState state, SuccessUpdateItemAction action) {
@@ -48,7 +46,6 @@ AppState updateItemReducer(AppState state, SuccessUpdateItemAction action) {
       return p0;
     });
     builder.items = list;
-    // builder.status = action.status.toBuilder();
   });
 }
 

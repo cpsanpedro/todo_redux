@@ -70,7 +70,8 @@ class _MyHomePageState extends State<MyHomePage> {
           onWillChange: (vm, model) {
             print("MODEL ${model.status} ${model.items}");
 
-            if (model.status == Status.success(message: "ToDo Updated")) {
+            if (model.status ==
+                Status.success(message: model.status?.message)) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text(model.status?.message ?? ""),
                   backgroundColor: Colors.green));
