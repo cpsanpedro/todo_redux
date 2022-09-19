@@ -90,35 +90,23 @@ class AppMiddleware extends EpicClass<AppState> {
       Stream<dynamic> actions, EpicStore<AppState> store) async* {
     await for (final action in actions) {
       if (action is DeleteItemAction) {
-        yield LoadingAction((b) => b.status =
-            Status((b) => b..loadingStatus = LoadingStatus.loading)
-                .toBuilder());
+        yield LoadingAction((b) => b.status = Status.loading().toBuilder());
         await Future.delayed(const Duration(seconds: 1));
-        await todoRepo.deleteTodo(ToDoItem((b) => b
-          ..id = action.item.id
-          ..title = action.item.title));
-        yield LoadingAction((b) => b.status =
-            Status((b) => b..loadingStatus = LoadingStatus.success)
-                .toBuilder());
-        yield SuccessDeleteItemAction((b) => b.item = action.item.toBuilder());
+        bool deleteResult = await todoRepo.deleteTodo(ToDoItem((b) => b
+              ..id = action.item.id
+              ..title = action.item.title)) ??
+            false;
+        if (deleteResult) {
+          yield SuccessDeleteItemAction(
+              (b) => b.item = action.item.toBuilder());
+          yield LoadingAction((b) => b.status =
+              Status.success(message: "ToDo Deleted - ${action.item.title}")
+                  .toBuilder());
+        } else {
+          yield LoadingAction((b) => b.status =
+              Status.error(message: "Error Deleting ToDo").toBuilder());
+        }
       }
     }
   }
-
-  // Stream<dynamic> loadingEpic(
-  //     Stream<dynamic> actions, EpicStore<AppState> store) async* {
-  //   await for (final action in actions) {
-  //     if (action is LoadingAction) {
-  //       if (action.status == Status.success()) {
-  //         yield SuccessUpdateItemAction(
-  //             (b) => b.item = action.status?.data as ToDoItemBuilder?);
-  //       } else if (action.status ==
-  //           Status.error(message: action.status?.message)) {
-  //         print("ERROR UPDATE");
-  //         yield ErrorUpdateItemAction((b) => b.error = "Error UPDATE");
-  //       }
-  //       // store.state.isLoading =
-  //     }
-  //   }
-  // }
 }
