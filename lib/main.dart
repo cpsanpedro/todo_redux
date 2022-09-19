@@ -62,6 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: StoreConnector<AppState, ToDoViewModel>(
+          distinct: true,
           converter: (Store<AppState> store) =>
               ToDoViewModel((builder) => builder
                 ..items = ListBuilder(store.state.items!)
