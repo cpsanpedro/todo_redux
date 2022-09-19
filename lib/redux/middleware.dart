@@ -49,7 +49,8 @@ class AppMiddleware extends EpicClass<AppState> {
         if (updateResult) {
           yield SuccessUpdateItemAction(
               (b) => b..item = action.item.toBuilder());
-          yield LoadingAction((b) => b.status = Status.success().toBuilder());
+          yield LoadingAction((b) =>
+              b.status = Status.success(message: "ToDo Updated").toBuilder());
         } else {
           yield LoadingAction(
               (b) => b.status = Status.error(message: "Error").toBuilder());

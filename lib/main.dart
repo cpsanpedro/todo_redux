@@ -66,14 +66,18 @@ class _MyHomePageState extends State<MyHomePage> {
               ToDoViewModel((builder) => builder
                 ..items = ListBuilder(store.state.items!)
                 ..status = store.state.status?.toBuilder()),
-          onDidChange: (vm, model) {
-            print("MODEL ${model.status}");
+          onWillChange: (vm, model) {
+            print("MODEL ${model.status} ${model.items}");
 
-            if (model.status == Status.error(message: model.status?.message) ||
-                model.status == Status.success()) {
-              print("STATUS MAIN ${model.status}");
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(model.status?.message ?? "")));
+            if (model.status == Status.success(message: "ToDo Updated")) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(model.status?.message ?? ""),
+                  backgroundColor: Colors.green));
+            } else if (model.status ==
+                Status.error(message: model.status?.message)) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(model.status?.message ?? ""),
+                  backgroundColor: Colors.red));
             }
           },
           builder: (BuildContext context, ToDoViewModel viewModel) {
