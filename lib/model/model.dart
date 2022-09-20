@@ -15,8 +15,9 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   Status? get status;
 
   factory AppState.init() {
-    return AppState(
-        (builder) => builder..items = <ToDoItem>[].build().toBuilder());
+    return AppState((builder) => builder
+      ..items = <ToDoItem>[].build().toBuilder()
+      ..status = Status.idle().toBuilder());
   }
 
   factory AppState.fromJson(Map json) {

@@ -77,7 +77,7 @@ abstract class SuccessDeleteItemAction
 class GetItemsAction extends CompactAction<AppState> {
   @override
   AppState reduce() {
-    print("GET ITEM ${state.items}");
+    print("GET ITEM ${state}");
     return state;
   }
 
@@ -85,10 +85,10 @@ class GetItemsAction extends CompactAction<AppState> {
   void after() {
     // TODO: implement after
     super.after();
-    print("GET AFTER ${state.items}");
-    dispatch(LoadedItemsAction((b) => b
-      ..items = state.items != null ? state.items!.toBuilder() : ListBuilder()
-      ..status = Status.idle().toBuilder()));
+    // print("GET AFTER ${state.items}");
+    // dispatch(LoadedItemsAction((b) => b
+    //   ..items = state.items != null ? state.items!.toBuilder() : ListBuilder()
+    //   ..status = Status.idle().toBuilder()));
   }
 }
 
@@ -118,17 +118,21 @@ abstract class LoadedItemsAction extends Object
         ..status = Status.loading().toBuilder());
     }
 
+    ToDoItem mockToDoItem = ToDoItem((item) => item
+      ..id = "1"
+      ..title = "Item 1");
+
     if (!request.hasError) {
       print("REDUCER ${AppState((builder) => builder
         ..items = request.data != null
-            ? ListBuilder<ToDoItem>(request.data)
+            ? ListBuilder<ToDoItem>([mockToDoItem])
             : ListBuilder()
-        ..status = Status.loading().toBuilder())}");
+        ..status = Status.idle().toBuilder())}");
       return AppState((builder) => builder
         ..items = request.data != null
-            ? ListBuilder<ToDoItem>(request.data)
+            ? ListBuilder<ToDoItem>([mockToDoItem])
             : ListBuilder()
-        ..status = Status.loading().toBuilder());
+        ..status = Status.idle().toBuilder());
     } else {
       return AppState((b) => b
         ..items = store.state.items!.toBuilder()
