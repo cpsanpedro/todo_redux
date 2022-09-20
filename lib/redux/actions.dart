@@ -1,20 +1,46 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
+import 'package:redux_compact/redux_compact.dart';
 import 'package:todo_redux/model/model.dart';
 
 import '../model/status.dart';
+import '../repository/repo.dart';
 
 part 'actions.g.dart';
 
-abstract class AddItemAction
+abstract class AddItemAction extends Object
+    with CompactAction<AppState>
     implements Built<AddItemAction, AddItemActionBuilder> {
   String? get id;
   String? get title;
+  AbstractRepo get todoRepo;
 
   AddItemAction._();
 
   factory AddItemAction([void Function(AddItemActionBuilder) updates]) =
       _$AddItemAction;
+
+  @override
+  makeRequest() {
+    Future.delayed(const Duration(seconds: 1));
+    // print("title ${title}");
+    return todoRepo.saveTodos(ToDoItem((b) => b
+          ..id = id
+          ..title = title)) ??
+        false;
+  }
+
+  @override
+  reduce() {
+    print("REQ DATA ADD ${request.data}");
+    return AppState((builder) => builder
+      ..items = ListBuilder<ToDoItem>([
+        ...?state.items,
+        ToDoItem((b) => b
+          ..title = title
+          ..id = id)
+      ]));
+  }
 }
 
 abstract class SuccessAddItemAction
@@ -47,12 +73,45 @@ abstract class SuccessDeleteItemAction
       _$SuccessDeleteItemAction;
 }
 
-class GetItemsAction {}
+class GetItemsAction extends CompactAction<AppState> {
+  @override
+  AppState reduce() {
+    print("GET ITEM ${state.items}");
+    return state;
+  }
 
-abstract class LoadedItemsAction
+  @override
+  void after() {
+    // TODO: implement after
+    super.after();
+    print("GET AFTER ${store.state.items}");
+    // store.dispatch(LoadedItemsAction((b) => b
+    //   ..items = state.items != null ? state.items!.toBuilder() : ListBuilder()
+    //   ..status = Status.idle().toBuilder()));
+  }
+}
+
+abstract class LoadedItemsAction extends Object
+    with CompactAction<AppState>
     implements Built<LoadedItemsAction, LoadedItemsActionBuilder> {
   BuiltList<ToDoItem> get items;
   Status get status;
+  AbstractRepo get todoRepo;
+
+  @override
+  makeRequest() {
+    Future.delayed(const Duration(seconds: 1));
+    print("HERE loaded");
+    return todoRepo.getTodos();
+  }
+
+  @override
+  AppState reduce() {
+    print("REQ ${request.data}");
+
+    return AppState((builder) => builder..items = items.toBuilder());
+  }
+
   LoadedItemsAction._();
 
   factory LoadedItemsAction([void Function(LoadedItemsActionBuilder) updates]) =

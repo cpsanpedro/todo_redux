@@ -42,8 +42,10 @@ dependencies:
   intl: ^0.17.0
   mockito: ^5.3.0
   redux: ^5.0.0
+  redux_compact: ^0.3.1
   redux_epics: ^0.15.1
   shared_preferences: ^2.0.15
+
 
 
 dev_dependencies:

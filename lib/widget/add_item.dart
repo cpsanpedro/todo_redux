@@ -5,6 +5,7 @@ import 'package:todo_redux/constants/consts.dart';
 import 'package:todo_redux/model/model.dart';
 import 'package:todo_redux/redux/actions.dart';
 
+import '../repository/repo.dart';
 import '../view_model/view_model.dart';
 
 class AddItemWidget extends StatefulWidget {
@@ -32,9 +33,11 @@ class _AddItemWidgetState extends State<AddItemWidget> {
       controller: controller,
       decoration: const InputDecoration(hintText: "What are your goals?"),
       onSubmitted: (val) {
+        final AbstractRepo todoRepo = Repo();
         _store?.dispatch(AddItemAction((b) => b
           ..title = controller.text
-          ..id = DateTime.now().toString().substring(0, 19)));
+          ..id = DateTime.now().toString().substring(0, 19)
+          ..todoRepo = todoRepo));
         controller.clear();
       },
     );

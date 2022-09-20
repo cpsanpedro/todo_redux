@@ -1,4 +1,3 @@
-import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -65,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
           distinct: true,
           converter: (Store<AppState> store) =>
               ToDoViewModel((builder) => builder
-                ..items = ListBuilder(store.state.items!)
+                ..items = ToDoViewModel().items?.toBuilder()
                 ..status = store.state.status?.toBuilder()),
           onWillChange: (vm, model) {
             print("MODEL ${model.status} ${model.items}");

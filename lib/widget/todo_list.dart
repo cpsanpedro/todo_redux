@@ -33,6 +33,7 @@ class _TodoListWidgetState extends State<TodoListWidget> {
 
   @override
   Widget build(BuildContext context) {
+    print("ITEMS ${widget.model.items}");
     return widget.model.items != null && widget.model.status != Status.loading()
         ? Expanded(
             child: ListView(

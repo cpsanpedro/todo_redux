@@ -11,11 +11,16 @@ class _$AddItemAction extends AddItemAction {
   final String? id;
   @override
   final String? title;
+  @override
+  final AbstractRepo todoRepo;
 
   factory _$AddItemAction([void Function(AddItemActionBuilder)? updates]) =>
       (new AddItemActionBuilder()..update(updates))._build();
 
-  _$AddItemAction._({this.id, this.title}) : super._();
+  _$AddItemAction._({this.id, this.title, required this.todoRepo}) : super._() {
+    BuiltValueNullFieldError.checkNotNull(
+        todoRepo, r'AddItemAction', 'todoRepo');
+  }
 
   @override
   AddItemAction rebuild(void Function(AddItemActionBuilder) updates) =>
@@ -27,19 +32,24 @@ class _$AddItemAction extends AddItemAction {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is AddItemAction && id == other.id && title == other.title;
+    return other is AddItemAction &&
+        id == other.id &&
+        title == other.title &&
+        todoRepo == other.todoRepo;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, id.hashCode), title.hashCode));
+    return $jf(
+        $jc($jc($jc(0, id.hashCode), title.hashCode), todoRepo.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'AddItemAction')
           ..add('id', id)
-          ..add('title', title))
+          ..add('title', title)
+          ..add('todoRepo', todoRepo))
         .toString();
   }
 }
@@ -56,6 +66,10 @@ class AddItemActionBuilder
   String? get title => _$this._title;
   set title(String? title) => _$this._title = title;
 
+  AbstractRepo? _todoRepo;
+  AbstractRepo? get todoRepo => _$this._todoRepo;
+  set todoRepo(AbstractRepo? todoRepo) => _$this._todoRepo = todoRepo;
+
   AddItemActionBuilder();
 
   AddItemActionBuilder get _$this {
@@ -63,6 +77,7 @@ class AddItemActionBuilder
     if ($v != null) {
       _id = $v.id;
       _title = $v.title;
+      _todoRepo = $v.todoRepo;
       _$v = null;
     }
     return this;
@@ -83,7 +98,12 @@ class AddItemActionBuilder
   AddItemAction build() => _build();
 
   _$AddItemAction _build() {
-    final _$result = _$v ?? new _$AddItemAction._(id: id, title: title);
+    final _$result = _$v ??
+        new _$AddItemAction._(
+            id: id,
+            title: title,
+            todoRepo: BuiltValueNullFieldError.checkNotNull(
+                todoRepo, r'AddItemAction', 'todoRepo'));
     replace(_$result);
     return _$result;
   }
@@ -374,16 +394,21 @@ class _$LoadedItemsAction extends LoadedItemsAction {
   final BuiltList<ToDoItem> items;
   @override
   final Status status;
+  @override
+  final AbstractRepo todoRepo;
 
   factory _$LoadedItemsAction(
           [void Function(LoadedItemsActionBuilder)? updates]) =>
       (new LoadedItemsActionBuilder()..update(updates))._build();
 
-  _$LoadedItemsAction._({required this.items, required this.status})
+  _$LoadedItemsAction._(
+      {required this.items, required this.status, required this.todoRepo})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(items, r'LoadedItemsAction', 'items');
     BuiltValueNullFieldError.checkNotNull(
         status, r'LoadedItemsAction', 'status');
+    BuiltValueNullFieldError.checkNotNull(
+        todoRepo, r'LoadedItemsAction', 'todoRepo');
   }
 
   @override
@@ -399,19 +424,22 @@ class _$LoadedItemsAction extends LoadedItemsAction {
     if (identical(other, this)) return true;
     return other is LoadedItemsAction &&
         items == other.items &&
-        status == other.status;
+        status == other.status &&
+        todoRepo == other.todoRepo;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, items.hashCode), status.hashCode));
+    return $jf(
+        $jc($jc($jc(0, items.hashCode), status.hashCode), todoRepo.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'LoadedItemsAction')
           ..add('items', items)
-          ..add('status', status))
+          ..add('status', status)
+          ..add('todoRepo', todoRepo))
         .toString();
   }
 }
@@ -429,6 +457,10 @@ class LoadedItemsActionBuilder
   StatusBuilder get status => _$this._status ??= new StatusBuilder();
   set status(StatusBuilder? status) => _$this._status = status;
 
+  AbstractRepo? _todoRepo;
+  AbstractRepo? get todoRepo => _$this._todoRepo;
+  set todoRepo(AbstractRepo? todoRepo) => _$this._todoRepo = todoRepo;
+
   LoadedItemsActionBuilder();
 
   LoadedItemsActionBuilder get _$this {
@@ -436,6 +468,7 @@ class LoadedItemsActionBuilder
     if ($v != null) {
       _items = $v.items.toBuilder();
       _status = $v.status.toBuilder();
+      _todoRepo = $v.todoRepo;
       _$v = null;
     }
     return this;
@@ -460,7 +493,10 @@ class LoadedItemsActionBuilder
     try {
       _$result = _$v ??
           new _$LoadedItemsAction._(
-              items: items.build(), status: status.build());
+              items: items.build(),
+              status: status.build(),
+              todoRepo: BuiltValueNullFieldError.checkNotNull(
+                  todoRepo, r'LoadedItemsAction', 'todoRepo'));
     } catch (_) {
       late String _$failedField;
       try {

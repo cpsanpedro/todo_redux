@@ -498,6 +498,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.0.0"
+  redux_compact:
+    dependency: "direct main"
+    description:
+      name: redux_compact
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.1"
   redux_epics:
     dependency: "direct main"
     description:
