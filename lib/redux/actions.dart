@@ -86,9 +86,9 @@ class GetItemsAction extends CompactAction<AppState> {
     // TODO: implement after
     super.after();
     // print("GET AFTER ${state.items}");
-    // dispatch(LoadedItemsAction((b) => b
-    //   ..items = state.items != null ? state.items!.toBuilder() : ListBuilder()
-    //   ..status = Status.idle().toBuilder()));
+    dispatch(LoadedItemsAction((b) => b
+      ..items = state.items != null ? state.items!.toBuilder() : ListBuilder()
+      ..status = Status.idle().toBuilder()));
   }
 }
 
@@ -100,7 +100,6 @@ abstract class LoadedItemsAction extends Object
 
   @override
   makeRequest() {
-    Future.delayed(const Duration(seconds: 1));
     return RepoAction.repository.getTodos();
   }
 
@@ -110,27 +109,16 @@ abstract class LoadedItemsAction extends Object
     print("loading ${request.loading}");
     print("REQ DATA ${request.data}");
 
-    // return state;
-
     if (request.loading) {
       return AppState((b) => b
         ..items = store.state.items!.toBuilder()
         ..status = Status.loading().toBuilder());
     }
 
-    ToDoItem mockToDoItem = ToDoItem((item) => item
-      ..id = "1"
-      ..title = "Item 1");
-
     if (!request.hasError) {
-      print("REDUCER ${AppState((builder) => builder
-        ..items = request.data != null
-            ? ListBuilder<ToDoItem>([mockToDoItem])
-            : ListBuilder()
-        ..status = Status.idle().toBuilder())}");
       return AppState((builder) => builder
         ..items = request.data != null
-            ? ListBuilder<ToDoItem>([mockToDoItem])
+            ? ListBuilder<ToDoItem>(request.data)
             : ListBuilder()
         ..status = Status.idle().toBuilder());
     } else {

@@ -25,6 +25,7 @@ class Api {
   }
 
   static Future<List<ToDoItem>> getTodos() async {
+    await Future.delayed(const Duration(seconds: 1));
     List<dynamic> list = await getList();
     print("LIST ${list}");
 
