@@ -5,7 +5,6 @@ import 'package:todo_redux/model/model.dart';
 import 'package:todo_redux/redux/repo_action.dart';
 
 import '../model/status.dart';
-import '../repository/repo.dart';
 
 part 'actions.g.dart';
 
@@ -14,7 +13,6 @@ abstract class AddItemAction extends Object
     implements Built<AddItemAction, AddItemActionBuilder> {
   String? get id;
   String? get title;
-  AbstractRepo get todoRepo;
 
   AddItemAction._();
 
@@ -23,9 +21,7 @@ abstract class AddItemAction extends Object
 
   @override
   makeRequest() {
-    Future.delayed(const Duration(seconds: 1));
-    // print("title ${title}");
-    return todoRepo.saveTodos(ToDoItem((b) => b
+    return RepoAction.repository.saveTodos(ToDoItem((b) => b
           ..id = id
           ..title = title)) ??
         false;
@@ -34,34 +30,68 @@ abstract class AddItemAction extends Object
   @override
   reduce() {
     print("REQ DATA ADD ${request.data}");
-    return AppState((builder) => builder
-      ..items = ListBuilder<ToDoItem>([
-        ...?state.items,
-        ToDoItem((b) => b
-          ..title = title
-          ..id = id)
-      ]));
+
+    if (request.loading) {
+      return AppState((b) => b
+        ..items = store.state.items!.toBuilder()
+        ..status = Status.loading().toBuilder());
+    }
+
+    if (!request.hasError) {
+      return AppState((builder) => builder
+        ..items = ListBuilder<ToDoItem>([
+          ...?state.items,
+          ToDoItem((b) => b
+            ..title = title
+            ..id = id)
+        ])
+        ..status = Status.idle().toBuilder());
+    } else {
+      return AppState((b) => b
+        ..items = store.state.items!.toBuilder()
+        ..status = Status.error(message: request.error.toString()).toBuilder());
+    }
   }
 }
 
-abstract class SuccessAddItemAction
-    implements Built<SuccessAddItemAction, SuccessAddItemActionBuilder> {
-  ToDoItem get item;
-
-  SuccessAddItemAction._();
-
-  factory SuccessAddItemAction(
-          [void Function(SuccessAddItemActionBuilder) updates]) =
-      _$SuccessAddItemAction;
-}
-
-abstract class DeleteItemAction
+abstract class DeleteItemAction extends Object
+    with CompactAction<AppState>
     implements Built<DeleteItemAction, DeleteItemActionBuilder> {
   ToDoItem get item;
   DeleteItemAction._();
 
   factory DeleteItemAction([void Function(DeleteItemActionBuilder) updates]) =
       _$DeleteItemAction;
+
+  @override
+  makeRequest() {
+    return RepoAction.repository.deleteTodo(ToDoItem((b) => b
+          ..id = item.id
+          ..title = item.title)) ??
+        false;
+  }
+
+  @override
+  reduce() {
+    if (request.loading) {
+      return AppState((b) => b
+        ..items = store.state.items!.toBuilder()
+        ..status = Status.loading().toBuilder());
+    }
+
+    if (!request.hasError) {
+      return AppState((builder) {
+        ListBuilder<ToDoItem> list = state.toBuilder().items;
+        list.remove(item);
+        builder.items = list;
+        builder.status = Status.idle().toBuilder();
+      });
+    } else {
+      return AppState((b) => b
+        ..items = store.state.items!.toBuilder()
+        ..status = Status.error(message: request.error.toString()).toBuilder());
+    }
+  }
 }
 
 abstract class SuccessDeleteItemAction
@@ -77,15 +107,12 @@ abstract class SuccessDeleteItemAction
 class GetItemsAction extends CompactAction<AppState> {
   @override
   AppState reduce() {
-    print("GET ITEM ${state}");
     return state;
   }
 
   @override
   void after() {
-    // TODO: implement after
     super.after();
-    // print("GET AFTER ${state.items}");
     dispatch(LoadedItemsAction((b) => b
       ..items = state.items != null ? state.items!.toBuilder() : ListBuilder()
       ..status = Status.idle().toBuilder()));
@@ -124,7 +151,7 @@ abstract class LoadedItemsAction extends Object
     } else {
       return AppState((b) => b
         ..items = store.state.items!.toBuilder()
-        ..status = Status.error(message: "Error").toBuilder());
+        ..status = Status.error(message: request.error.toString()).toBuilder());
     }
   }
 

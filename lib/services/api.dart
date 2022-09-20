@@ -7,6 +7,7 @@ import '../model/model.dart';
 class Api {
   static Future<List> getList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    await Future.delayed(const Duration(seconds: 1));
     var stateString = prefs.getString("items") ?? "";
     List<dynamic> todos = [];
     if (stateString.isNotEmpty) {
@@ -25,7 +26,6 @@ class Api {
   }
 
   static Future<List<ToDoItem>> getTodos() async {
-    await Future.delayed(const Duration(seconds: 1));
     List<dynamic> list = await getList();
     print("LIST ${list}");
 
@@ -37,6 +37,7 @@ class Api {
 
   static Future<bool> saveTodos(ToDoItem item) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
     List<dynamic> todos = await getList();
 
     List<ToDoItem> parsedTodos = [];

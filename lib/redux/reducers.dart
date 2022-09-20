@@ -5,9 +5,7 @@ import 'package:todo_redux/redux/actions.dart';
 import '../model/model.dart';
 
 final Reducer<AppState> appReducer = combineReducers<AppState>([
-  // TypedReducer<AppState, SuccessAddItemAction>(addItemReducer),
-  TypedReducer<AppState, SuccessDeleteItemAction>(deleteItemReducer),
-  // TypedReducer<AppState, LoadedItemsAction>(loadedItemReducer),
+  // TypedReducer<AppState, SuccessDeleteItemAction>(deleteItemReducer),
   TypedReducer<AppState, SuccessUpdateItemAction>(updateItemReducer),
   TypedReducer<AppState, LoadingAction>(loadingReducer),
 ]);
@@ -22,13 +20,13 @@ final Reducer<AppState> appReducer = combineReducers<AppState>([
 //     ]));
 // }
 
-AppState deleteItemReducer(AppState state, SuccessDeleteItemAction action) {
-  return AppState((builder) {
-    ListBuilder<ToDoItem> list = state.toBuilder().items;
-    list.remove(action.item);
-    builder.items = list;
-  });
-}
+// AppState deleteItemReducer(AppState state, SuccessDeleteItemAction action) {
+//   return AppState((builder) {
+//     ListBuilder<ToDoItem> list = state.toBuilder().items;
+//     list.remove(action.item);
+//     builder.items = list;
+//   });
+// }
 
 // AppState loadedItemReducer(AppState state, LoadedItemsAction action) {
 //   return AppState((builder) => builder..items = action.items.toBuilder());

@@ -36,8 +36,7 @@ class _AddItemWidgetState extends State<AddItemWidget> {
         final AbstractRepo todoRepo = Repo();
         _store?.dispatch(AddItemAction((b) => b
           ..title = controller.text
-          ..id = DateTime.now().toString().substring(0, 19)
-          ..todoRepo = todoRepo));
+          ..id = DateTime.now().toString().substring(0, 19)));
         controller.clear();
       },
     );
