@@ -11,5 +11,6 @@ class Label {
       errorUpdatingToDo = "Error updating ToDo",
       todoUpdated = "ToDo Updated",
       todoAdded = "ToDo Added",
-      todoDeleted = "ToDo Deleted";
+      todoDeleted = "ToDo Deleted",
+      somethingWentWrong = "Something went wrong. Please try again.";
 }

@@ -4,6 +4,7 @@ import 'package:redux_compact/redux_compact.dart';
 import 'package:todo_redux/model/model.dart';
 import 'package:todo_redux/redux/repo_action.dart';
 
+import '../constants/consts.dart';
 import '../model/status.dart';
 
 part 'actions.g.dart';
@@ -37,7 +38,7 @@ abstract class AddItemAction extends Object
         ..status = Status.loading().toBuilder());
     }
 
-    if (!request.hasError) {
+    if (!request.hasError && request.data) {
       return AppState((builder) => builder
         ..items = ListBuilder<ToDoItem>([
           ...?state.items,
@@ -45,11 +46,13 @@ abstract class AddItemAction extends Object
             ..title = title
             ..id = id)
         ])
-        ..status = Status.idle().toBuilder());
+        ..status = Status.success(message: Label.todoAdded).toBuilder());
     } else {
       return AppState((b) => b
         ..items = store.state.items!.toBuilder()
-        ..status = Status.error(message: request.error.toString()).toBuilder());
+        ..status = Status.error(
+                message: request.error.message ?? Label.errorAddingToDo)
+            .toBuilder());
     }
   }
 }
@@ -79,17 +82,21 @@ abstract class DeleteItemAction extends Object
         ..status = Status.loading().toBuilder());
     }
 
-    if (!request.hasError) {
+    if (!request.hasError && request.data) {
       return AppState((builder) {
         ListBuilder<ToDoItem> list = state.toBuilder().items;
         list.remove(item);
         builder.items = list;
-        builder.status = Status.idle().toBuilder();
+        builder.status =
+            Status.success(message: "${Label.todoDeleted} - ${item.title}")
+                .toBuilder();
       });
     } else {
       return AppState((b) => b
         ..items = store.state.items!.toBuilder()
-        ..status = Status.error(message: request.error.toString()).toBuilder());
+        ..status = Status.error(
+                message: request.error.message ?? Label.errorDeletingToDo)
+            .toBuilder());
     }
   }
 }
@@ -141,7 +148,9 @@ abstract class LoadedItemsAction extends Object
     } else {
       return AppState((b) => b
         ..items = store.state.items!.toBuilder()
-        ..status = Status.error(message: request.error.toString()).toBuilder());
+        ..status = Status.error(
+                message: request.error.message ?? Label.somethingWentWrong)
+            .toBuilder());
     }
   }
 
@@ -170,13 +179,15 @@ abstract class UpdateItemAction extends Object
 
   @override
   reduce() {
+    print("REQUEST DATA ${request.data}");
+
     if (request.loading) {
       return AppState((b) => b
         ..items = store.state.items!.toBuilder()
         ..status = Status.loading().toBuilder());
     }
 
-    if (!request.hasError) {
+    if (!request.hasError && request.data) {
       return AppState((builder) {
         ListBuilder<ToDoItem> list = state.toBuilder().items;
         list.map((p0) {
@@ -188,30 +199,14 @@ abstract class UpdateItemAction extends Object
           return p0;
         });
         builder.items = list;
+        builder.status = Status.success(message: Label.todoUpdated).toBuilder();
       });
     } else {
       return AppState((b) => b
         ..items = store.state.items!.toBuilder()
-        ..status = Status.error(message: request.error.toString()).toBuilder());
+        ..status = Status.error(
+                message: request.error.message ?? Label.errorUpdatingToDo)
+            .toBuilder());
     }
   }
-}
-
-abstract class ErrorUpdateItemAction
-    implements Built<ErrorUpdateItemAction, ErrorUpdateItemActionBuilder> {
-  String get error;
-  ErrorUpdateItemAction._();
-
-  factory ErrorUpdateItemAction(
-          [void Function(ErrorUpdateItemActionBuilder) updates]) =
-      _$ErrorUpdateItemAction;
-}
-
-abstract class LoadingAction
-    implements Built<LoadingAction, LoadingActionBuilder> {
-  Status? get status;
-  LoadingAction._();
-
-  factory LoadingAction([void Function(LoadingActionBuilder) updates]) =
-      _$LoadingAction;
 }

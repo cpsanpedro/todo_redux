@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ..items = store.state.items?.toBuilder()
                 ..status = store.state.status?.toBuilder()),
           onWillChange: (vm, model) {
-            print("MODEL ${model.status} ${model.items}");
+            // print("MODEL ${model.status} ${model.items}");
 
             if (model.status ==
                 Status.success(message: model.status?.message)) {
@@ -82,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           },
           builder: (BuildContext context, ToDoViewModel viewModel) {
-            print("VM ${viewModel.items}");
+            // print("VM ${viewModel.items}");
             return Stack(
               children: [
                 Positioned(

@@ -1,12 +1,11 @@
 import 'package:redux/redux.dart';
-import 'package:todo_redux/redux/actions.dart';
 
 import '../model/model.dart';
 
 final Reducer<AppState> appReducer = combineReducers<AppState>([
   // TypedReducer<AppState, SuccessDeleteItemAction>(deleteItemReducer),
   // TypedReducer<AppState, SuccessUpdateItemAction>(updateItemReducer),
-  TypedReducer<AppState, LoadingAction>(loadingReducer),
+  // TypedReducer<AppState, LoadingAction>(loadingReducer),
 ]);
 
 // AppState addItemReducer(AppState state, SuccessAddItemAction action) {
@@ -46,9 +45,9 @@ final Reducer<AppState> appReducer = combineReducers<AppState>([
 //   });
 // }
 
-AppState loadingReducer(AppState state, LoadingAction action) {
-  print("LOADING REDUCER ${action.status}");
-  return AppState((builder) => builder
-    ..items = state.toBuilder().items
-    ..status = action.status?.toBuilder());
-}
+// AppState loadingReducer(AppState state, LoadingAction action) {
+//   print("LOADING REDUCER ${action.status}");
+//   return AppState((builder) => builder
+//     ..items = state.toBuilder().items
+//     ..status = action.status?.toBuilder());
+// }

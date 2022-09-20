@@ -6,15 +6,19 @@ import '../model/model.dart';
 
 class Api {
   static Future<List> getList() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await Future.delayed(const Duration(seconds: 1));
-    var stateString = prefs.getString("items") ?? "";
-    List<dynamic> todos = [];
-    if (stateString.isNotEmpty) {
-      Map map = jsonDecode(stateString);
-      todos = map["items"];
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await Future.delayed(const Duration(seconds: 1));
+      var stateString = prefs.getString("items") ?? "";
+      List<dynamic> todos = [];
+      if (stateString.isNotEmpty) {
+        Map map = jsonDecode(stateString);
+        todos = map["items"];
+      }
+      return todos;
+    } catch (e) {
+      rethrow;
     }
-    return todos;
   }
 
   static Future<List<ToDoItem>> getAndParsedList() async {
@@ -26,47 +30,61 @@ class Api {
   }
 
   static Future<List<ToDoItem>> getTodos() async {
-    List<dynamic> list = await getList();
-    print("LIST ${list}");
+    try {
+      List<dynamic> list = await getList();
+      print("LIST ${list}");
 
-    List<ToDoItem> todos =
-        list.map<ToDoItem>((e) => ToDoItem.fromJson(e)!).toList();
+      List<ToDoItem> todos =
+          list.map<ToDoItem>((e) => ToDoItem.fromJson(e)!).toList();
 
-    return todos;
+      return todos;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   static Future<bool> saveTodos(ToDoItem item) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    List<dynamic> todos = await getList();
+      List<dynamic> todos = await getList();
 
-    List<ToDoItem> parsedTodos = [];
-    parsedTodos
-        .addAll(todos.map<ToDoItem>((e) => ToDoItem.fromJson(e)!).toList());
-    parsedTodos.add(item);
-    Map<String, List<ToDoItem>> newMap = {"items": parsedTodos};
+      List<ToDoItem> parsedTodos = [];
+      parsedTodos
+          .addAll(todos.map<ToDoItem>((e) => ToDoItem.fromJson(e)!).toList());
+      parsedTodos.add(item);
+      Map<String, List<ToDoItem>> newMap = {"items": parsedTodos};
 
-    return prefs.setString("items", jsonEncode(newMap));
+      return prefs.setString("items", jsonEncode(newMap));
+    } catch (e) {
+      rethrow;
+    }
   }
 
   static Future<bool> updateTodo(ToDoItem item) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    List<ToDoItem> parsedTodos = await getAndParsedList();
-    int index = parsedTodos.indexWhere((element) => element.id == item.id);
-    parsedTodos[index] = item;
-    Map<String, List<ToDoItem>> newMap = {"items": parsedTodos};
-
-    // return false;
-    return prefs.setString("items", jsonEncode(newMap));
+      List<ToDoItem> parsedTodos = await getAndParsedList();
+      int index = parsedTodos.indexWhere((element) => element.id == item.id);
+      parsedTodos[index] = item;
+      Map<String, List<ToDoItem>> newMap = {"items": parsedTodos};
+      return prefs.setString("items", jsonEncode(newMap));
+    } catch (e) {
+      rethrow;
+    }
   }
 
   static Future<bool> deleteTodo(ToDoItem item) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<ToDoItem> parsedTodos = await getAndParsedList();
-    parsedTodos.removeWhere((element) => element.id == item.id);
-    Map<String, List<ToDoItem>> newMap = {"items": parsedTodos};
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      List<ToDoItem> parsedTodos = await getAndParsedList();
+      parsedTodos.removeWhere((element) => element.id == item.id);
+      Map<String, List<ToDoItem>> newMap = {"items": parsedTodos};
 
-    return prefs.setString("items", jsonEncode(newMap));
+      return prefs.setString("items", jsonEncode(newMap));
+    } catch (e) {
+      rethrow;
+    }
   }
 }
