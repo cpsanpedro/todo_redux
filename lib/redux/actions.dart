@@ -94,16 +94,6 @@ abstract class DeleteItemAction extends Object
   }
 }
 
-abstract class SuccessDeleteItemAction
-    implements Built<SuccessDeleteItemAction, SuccessDeleteItemActionBuilder> {
-  ToDoItem get item;
-  SuccessDeleteItemAction._();
-
-  factory SuccessDeleteItemAction(
-          [void Function(SuccessDeleteItemActionBuilder) updates]) =
-      _$SuccessDeleteItemAction;
-}
-
 class GetItemsAction extends CompactAction<AppState> {
   @override
   AppState reduce() {
@@ -161,23 +151,50 @@ abstract class LoadedItemsAction extends Object
       _$LoadedItemsAction;
 }
 
-abstract class UpdateItemAction
+abstract class UpdateItemAction extends Object
+    with CompactAction
     implements Built<UpdateItemAction, UpdateItemActionBuilder> {
   ToDoItem get item;
   UpdateItemAction._();
 
   factory UpdateItemAction([void Function(UpdateItemActionBuilder) updates]) =
       _$UpdateItemAction;
-}
 
-abstract class SuccessUpdateItemAction
-    implements Built<SuccessUpdateItemAction, SuccessUpdateItemActionBuilder> {
-  ToDoItem get item;
-  SuccessUpdateItemAction._();
+  @override
+  makeRequest() {
+    return RepoAction.repository.updateTodo(ToDoItem((b) => b
+          ..id = item.id
+          ..title = item.title)) ??
+        false;
+  }
 
-  factory SuccessUpdateItemAction(
-          [void Function(SuccessUpdateItemActionBuilder) updates]) =
-      _$SuccessUpdateItemAction;
+  @override
+  reduce() {
+    if (request.loading) {
+      return AppState((b) => b
+        ..items = store.state.items!.toBuilder()
+        ..status = Status.loading().toBuilder());
+    }
+
+    if (!request.hasError) {
+      return AppState((builder) {
+        ListBuilder<ToDoItem> list = state.toBuilder().items;
+        list.map((p0) {
+          if (p0.id == item.id) {
+            p0 = ToDoItem((b) => b
+              ..title = item.title
+              ..id = item.id);
+          }
+          return p0;
+        });
+        builder.items = list;
+      });
+    } else {
+      return AppState((b) => b
+        ..items = store.state.items!.toBuilder()
+        ..status = Status.error(message: request.error.toString()).toBuilder());
+    }
+  }
 }
 
 abstract class ErrorUpdateItemAction
