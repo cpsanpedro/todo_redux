@@ -26,6 +26,7 @@ class Api {
 
   static Future<List<ToDoItem>> getTodos() async {
     List<dynamic> list = await getList();
+    print("LIST ${list}");
 
     List<ToDoItem> todos =
         list.map<ToDoItem>((e) => ToDoItem.fromJson(e)!).toList();

@@ -7,7 +7,7 @@ import '../model/model.dart';
 final Reducer<AppState> appReducer = combineReducers<AppState>([
   // TypedReducer<AppState, SuccessAddItemAction>(addItemReducer),
   TypedReducer<AppState, SuccessDeleteItemAction>(deleteItemReducer),
-  TypedReducer<AppState, LoadedItemsAction>(loadedItemReducer),
+  // TypedReducer<AppState, LoadedItemsAction>(loadedItemReducer),
   TypedReducer<AppState, SuccessUpdateItemAction>(updateItemReducer),
   TypedReducer<AppState, LoadingAction>(loadingReducer),
 ]);
@@ -30,9 +30,9 @@ AppState deleteItemReducer(AppState state, SuccessDeleteItemAction action) {
   });
 }
 
-AppState loadedItemReducer(AppState state, LoadedItemsAction action) {
-  return AppState((builder) => builder..items = action.items.toBuilder());
-}
+// AppState loadedItemReducer(AppState state, LoadedItemsAction action) {
+//   return AppState((builder) => builder..items = action.items.toBuilder());
+// }
 
 AppState updateItemReducer(AppState state, SuccessUpdateItemAction action) {
   return AppState((builder) {

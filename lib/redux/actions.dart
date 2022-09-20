@@ -2,6 +2,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:redux_compact/redux_compact.dart';
 import 'package:todo_redux/model/model.dart';
+import 'package:todo_redux/redux/repo_action.dart';
 
 import '../model/status.dart';
 import '../repository/repo.dart';
@@ -84,10 +85,10 @@ class GetItemsAction extends CompactAction<AppState> {
   void after() {
     // TODO: implement after
     super.after();
-    print("GET AFTER ${store.state.items}");
-    // store.dispatch(LoadedItemsAction((b) => b
-    //   ..items = state.items != null ? state.items!.toBuilder() : ListBuilder()
-    //   ..status = Status.idle().toBuilder()));
+    print("GET AFTER ${state.items}");
+    dispatch(LoadedItemsAction((b) => b
+      ..items = state.items != null ? state.items!.toBuilder() : ListBuilder()
+      ..status = Status.idle().toBuilder()));
   }
 }
 
@@ -96,20 +97,43 @@ abstract class LoadedItemsAction extends Object
     implements Built<LoadedItemsAction, LoadedItemsActionBuilder> {
   BuiltList<ToDoItem> get items;
   Status get status;
-  AbstractRepo get todoRepo;
 
   @override
   makeRequest() {
     Future.delayed(const Duration(seconds: 1));
-    print("HERE loaded");
-    return todoRepo.getTodos();
+    return RepoAction.repository.getTodos();
   }
 
   @override
   AppState reduce() {
-    print("REQ ${request.data}");
+    print("REQ error ${request.error}");
+    print("loading ${request.loading}");
+    print("REQ DATA ${request.data}");
 
-    return AppState((builder) => builder..items = items.toBuilder());
+    // return state;
+
+    if (request.loading) {
+      return AppState((b) => b
+        ..items = store.state.items!.toBuilder()
+        ..status = Status.loading().toBuilder());
+    }
+
+    if (!request.hasError) {
+      print("REDUCER ${AppState((builder) => builder
+        ..items = request.data != null
+            ? ListBuilder<ToDoItem>(request.data)
+            : ListBuilder()
+        ..status = Status.loading().toBuilder())}");
+      return AppState((builder) => builder
+        ..items = request.data != null
+            ? ListBuilder<ToDoItem>(request.data)
+            : ListBuilder()
+        ..status = Status.loading().toBuilder());
+    } else {
+      return AppState((b) => b
+        ..items = store.state.items!.toBuilder()
+        ..status = Status.error(message: "Error").toBuilder());
+    }
   }
 
   LoadedItemsAction._();

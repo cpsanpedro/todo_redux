@@ -82,6 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
             }
           },
           builder: (BuildContext context, ToDoViewModel viewModel) {
+            print("VM ${viewModel.items}");
             return Stack(
               children: [
                 Positioned(
