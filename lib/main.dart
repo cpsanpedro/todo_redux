@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
           distinct: true,
           converter: (Store<AppState> store) =>
               ToDoViewModel((builder) => builder
-                ..items = ToDoViewModel().items?.toBuilder()
+                ..items = store.state.items?.toBuilder()
                 ..status = store.state.status?.toBuilder()),
           onWillChange: (vm, model) {
             print("MODEL ${model.status} ${model.items}");
