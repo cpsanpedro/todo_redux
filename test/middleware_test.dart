@@ -1,5 +1,4 @@
 import 'package:built_collection/built_collection.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
@@ -17,22 +16,17 @@ class MockRepo extends Mock implements AbstractRepo {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  MockRepo mockRepo = MockRepo();
-  var appMiddleware = AppMiddleware(mockRepo);
-  final epics = combineEpics<AppState>([appMiddleware]);
-  Store<AppState> store = Store<AppState>(appReducer,
-      initialState: AppState.init(), middleware: [EpicMiddleware(epics)]);
+  late MockRepo mockRepo;
+  late AppMiddleware appMiddleware;
+  Stream<dynamic> Function(Stream<dynamic>, EpicStore<AppState>) epics;
+  late Store<AppState> store;
 
   setUpAll(() {
-    const MethodChannel('plugins.flutter.io/shared_preferences_macos')
-        .setMockMethodCallHandler((MethodCall methodCall) async {
-      if (methodCall.method == 'getAll') {
-        return <String, dynamic>{
-          "flutter.id": "1"
-        }; // set initial values here if desired
-      }
-      return null;
-    });
+    mockRepo = MockRepo();
+    appMiddleware = AppMiddleware(mockRepo);
+    epics = combineEpics<AppState>([appMiddleware]);
+    store = Store<AppState>(appReducer,
+        initialState: AppState.init(), middleware: [EpicMiddleware(epics)]);
   });
 
   test('should load init', () async {
@@ -70,12 +64,6 @@ void main() {
   });
 
   test('should add another item', () async {
-    MockRepo mockRepo = MockRepo();
-    var appMiddleware = AppMiddleware(mockRepo);
-    final epics = combineEpics<AppState>([appMiddleware]);
-    store = Store<AppState>(appReducer,
-        initialState: AppState.init(), middleware: [EpicMiddleware(epics)]);
-
     AddItemAction addItemAction = AddItemAction((b) => b
       ..id = mockToDoItem.id
       ..title = mockToDoItem.title);
@@ -96,9 +84,6 @@ void main() {
     SuccessAddItemAction successAddTwo = SuccessAddItemAction((b) => b.item
       ..title = anotherMockToDoItem.title
       ..id = anotherMockToDoItem.id);
-
-    store.dispatch(addItemAction);
-    store.dispatch(addAnotherItemAction);
 
     when(mockRepo.saveTodos(mockToDoItem)).thenAnswer((realInvocation) {
       return Future.value(true);
