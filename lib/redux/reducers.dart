@@ -13,7 +13,7 @@ final Reducer<AppState> appReducer = combineReducers<AppState>([
 ]);
 
 AppState addItemReducer(AppState state, SuccessAddItemAction action) {
-  return AppState((builder) => builder
+  return state.rebuild((p0) => p0
     ..items = ListBuilder<ToDoItem>([
       ...?state.items,
       ToDoItem((b) => b
@@ -23,19 +23,19 @@ AppState addItemReducer(AppState state, SuccessAddItemAction action) {
 }
 
 AppState deleteItemReducer(AppState state, SuccessDeleteItemAction action) {
-  return AppState((builder) {
+  return state.rebuild((p0) {
     ListBuilder<ToDoItem> list = state.toBuilder().items;
     list.remove(action.item);
-    builder.items = list;
+    p0.items = list;
   });
 }
 
 AppState loadedItemReducer(AppState state, LoadedItemsAction action) {
-  return AppState((builder) => builder..items = action.items.toBuilder());
+  return state.rebuild((p0) => p0..items = action.items.toBuilder());
 }
 
 AppState updateItemReducer(AppState state, SuccessUpdateItemAction action) {
-  return AppState((builder) {
+  return state.rebuild((builder) {
     ListBuilder<ToDoItem> list = state.toBuilder().items;
     list.map((p0) {
       if (p0.id == action.item.id) {
@@ -50,8 +50,7 @@ AppState updateItemReducer(AppState state, SuccessUpdateItemAction action) {
 }
 
 AppState loadingReducer(AppState state, LoadingAction action) {
-  print("LOADING REDUCER ${action.status}");
-  return AppState((builder) => builder
+  return state.rebuild((p0) => p0
     ..items = state.toBuilder().items
     ..status = action.status?.toBuilder());
 }
