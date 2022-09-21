@@ -182,17 +182,13 @@ class DeleteItemActionBuilder
 
 class _$LoadedItemsAction extends LoadedItemsAction {
   @override
-  final BuiltList<ToDoItem> items;
-  @override
   final Status status;
 
   factory _$LoadedItemsAction(
           [void Function(LoadedItemsActionBuilder)? updates]) =>
       (new LoadedItemsActionBuilder()..update(updates))._build();
 
-  _$LoadedItemsAction._({required this.items, required this.status})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(items, r'LoadedItemsAction', 'items');
+  _$LoadedItemsAction._({required this.status}) : super._() {
     BuiltValueNullFieldError.checkNotNull(
         status, r'LoadedItemsAction', 'status');
   }
@@ -208,20 +204,17 @@ class _$LoadedItemsAction extends LoadedItemsAction {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is LoadedItemsAction &&
-        items == other.items &&
-        status == other.status;
+    return other is LoadedItemsAction && status == other.status;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, items.hashCode), status.hashCode));
+    return $jf($jc(0, status.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'LoadedItemsAction')
-          ..add('items', items)
           ..add('status', status))
         .toString();
   }
@@ -230,11 +223,6 @@ class _$LoadedItemsAction extends LoadedItemsAction {
 class LoadedItemsActionBuilder
     implements Builder<LoadedItemsAction, LoadedItemsActionBuilder> {
   _$LoadedItemsAction? _$v;
-
-  ListBuilder<ToDoItem>? _items;
-  ListBuilder<ToDoItem> get items =>
-      _$this._items ??= new ListBuilder<ToDoItem>();
-  set items(ListBuilder<ToDoItem>? items) => _$this._items = items;
 
   StatusBuilder? _status;
   StatusBuilder get status => _$this._status ??= new StatusBuilder();
@@ -245,7 +233,6 @@ class LoadedItemsActionBuilder
   LoadedItemsActionBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _items = $v.items.toBuilder();
       _status = $v.status.toBuilder();
       _$v = null;
     }
@@ -269,14 +256,10 @@ class LoadedItemsActionBuilder
   _$LoadedItemsAction _build() {
     _$LoadedItemsAction _$result;
     try {
-      _$result = _$v ??
-          new _$LoadedItemsAction._(
-              items: items.build(), status: status.build());
+      _$result = _$v ?? new _$LoadedItemsAction._(status: status.build());
     } catch (_) {
       late String _$failedField;
       try {
-        _$failedField = 'items';
-        items.build();
         _$failedField = 'status';
         status.build();
       } catch (e) {

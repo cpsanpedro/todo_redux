@@ -30,29 +30,31 @@ abstract class AddItemAction extends Object
 
   @override
   reduce() {
-    print("REQ DATA ADD ${request.data}");
-    print("REQ loading ${request.loading}");
-
     if (request.loading) {
-      return AppState((b) => b
-        ..items = store.state.items!.toBuilder()
-        ..status = Status.loading().toBuilder());
+      return state.rebuild((p0) => p0..status = Status.loading().toBuilder());
     }
 
-    if (!request.hasError && request.data) {
-      return AppState((builder) => builder
-        ..items = ListBuilder<ToDoItem>([
-          ...?state.items,
-          ToDoItem((b) => b
-            ..title = title
-            ..id = id)
-        ])
-        ..status = Status.success(message: Label.todoAdded).toBuilder());
-    } else {
+    if (request.hasError) {
       return state.rebuild((p0) => p0
         ..status = Status.error(
                 message: request.error?.message ?? Label.errorAddingToDo)
             .toBuilder());
+    } else {
+      if (request.data == true) {
+        return state.rebuild((p0) {
+          p0
+            ..items = ListBuilder<ToDoItem>([
+              ...?state.items,
+              ToDoItem((b) => b
+                ..title = title
+                ..id = id)
+            ])
+            ..status = Status.success(message: Label.todoAdded).toBuilder();
+        });
+      } else {
+        return state.rebuild((p0) => p0
+          ..status = Status.error(message: Label.errorAddingToDo).toBuilder());
+      }
     }
   }
 }
@@ -77,48 +79,36 @@ abstract class DeleteItemAction extends Object
   @override
   reduce() {
     if (request.loading) {
-      return AppState((b) => b
-        ..items = store.state.items!.toBuilder()
-        ..status = Status.loading().toBuilder());
+      return state.rebuild((p0) => p0..status = Status.loading().toBuilder());
     }
 
-    if (!request.hasError && request.data) {
-      return AppState((builder) {
-        ListBuilder<ToDoItem> list = state.toBuilder().items;
-        list.remove(item);
-        builder.items = list;
-        builder.status =
-            Status.success(message: "${Label.todoDeleted} - ${item.title}")
-                .toBuilder();
-      });
-    } else {
+    if (request.hasError) {
       return state.rebuild((p0) => p0
         ..status = Status.error(
                 message: request.error?.message ?? Label.errorDeletingToDo)
             .toBuilder());
+    } else {
+      if (request.data == true) {
+        return state.rebuild((p0) {
+          ListBuilder<ToDoItem> list = state.toBuilder().items;
+          list.remove(item);
+          p0.items = list;
+          p0.status =
+              Status.success(message: "${Label.todoDeleted} - ${item.title}")
+                  .toBuilder();
+        });
+      } else {
+        return state.rebuild((p0) => p0
+          ..status =
+              Status.error(message: Label.errorDeletingToDo).toBuilder());
+      }
     }
-  }
-}
-
-class GetItemsAction extends CompactAction<AppState> {
-  @override
-  AppState reduce() {
-    return state;
-  }
-
-  @override
-  void after() {
-    super.after();
-    dispatch(LoadedItemsAction((b) => b
-      ..items = state.items != null ? state.items!.toBuilder() : ListBuilder()
-      ..status = Status.idle().toBuilder()));
   }
 }
 
 abstract class LoadedItemsAction extends Object
     with CompactAction<AppState>
     implements Built<LoadedItemsAction, LoadedItemsActionBuilder> {
-  BuiltList<ToDoItem> get items;
   Status get status;
 
   @override
@@ -128,28 +118,29 @@ abstract class LoadedItemsAction extends Object
 
   @override
   AppState reduce() {
-    print("REQ error ${request.error}");
-    print("loading ${request.loading}");
-    print("REQ DATA ${request.data}");
-
     if (request.loading) {
-      return AppState((b) => b
-        ..items = store.state.items!.toBuilder()
-        ..status = Status.loading().toBuilder());
+      return state.rebuild((p0) => p0..status = Status.loading().toBuilder());
     }
 
-    if (!request.hasError) {
-      return AppState((builder) => builder
-        ..items = request.data != null
-            ? ListBuilder<ToDoItem>(request.data)
-            : ListBuilder()
-        ..status = Status.idle().toBuilder());
-    } else {
-      return AppState((b) => b
-        ..items = store.state.items!.toBuilder()
+    if (request.hasError) {
+      return state.rebuild((p0) => p0
         ..status = Status.error(
-                message: request.error.message ?? Label.somethingWentWrong)
+                message: request.error?.message ?? Label.somethingWentWrong)
             .toBuilder());
+    } else {
+      if (request.data != null) {
+        return state.rebuild((p0) {
+          p0
+            ..items = request.data != null
+                ? ListBuilder<ToDoItem>(request.data)
+                : ListBuilder()
+            ..status = Status.idle().toBuilder();
+        });
+      } else {
+        return state.rebuild((p0) => p0
+          ..status =
+              Status.error(message: Label.somethingWentWrong).toBuilder());
+      }
     }
   }
 
@@ -160,7 +151,7 @@ abstract class LoadedItemsAction extends Object
 }
 
 abstract class UpdateItemAction extends Object
-    with CompactAction
+    with CompactAction<AppState>
     implements Built<UpdateItemAction, UpdateItemActionBuilder> {
   ToDoItem get item;
   UpdateItemAction._();
@@ -179,13 +170,11 @@ abstract class UpdateItemAction extends Object
   @override
   reduce() {
     if (request.loading) {
-      return AppState((b) => b
-        ..items = store.state.items!.toBuilder()
-        ..status = Status.loading().toBuilder());
+      return state.rebuild((p0) => p0..status = Status.loading().toBuilder());
     }
 
     if (!request.hasError && request.data) {
-      return AppState((builder) {
+      return state.rebuild((builder) {
         ListBuilder<ToDoItem> list = state.toBuilder().items;
         list.map((p0) {
           if (p0.id == item.id) {
@@ -195,13 +184,11 @@ abstract class UpdateItemAction extends Object
           }
           return p0;
         });
-
         builder.items = list;
         builder.status = Status.success(message: Label.todoUpdated).toBuilder();
       });
     } else {
-      return AppState((b) => b
-        ..items = store.state.items!.toBuilder()
+      return state.rebuild((p0) => p0
         ..status = Status.error(
                 message: request.error?.message ?? Label.errorUpdatingToDo)
             .toBuilder());

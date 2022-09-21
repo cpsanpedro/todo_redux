@@ -18,7 +18,6 @@ class MockRepo extends Mock implements AbstractRepo {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  late MockRepo mockRepo;
   late Store<AppState> store;
 
   setUp(() {
@@ -31,9 +30,8 @@ void main() {
   });
 
   test('should load init', () async {
-    LoadedItemsAction emptyLoaded = LoadedItemsAction((b) => b
-      ..items = ListBuilder([])
-      ..status = Status.idle().toBuilder());
+    LoadedItemsAction emptyLoaded =
+        LoadedItemsAction((b) => b..status = Status.idle().toBuilder());
 
     when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
       return Future.value([]);
@@ -55,9 +53,8 @@ void main() {
   });
 
   test('should load 1 item', () async {
-    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
-      ..items = ListBuilder([mockList.first])
-      ..status = Status.idle().toBuilder());
+    LoadedItemsAction loadedItemsAction =
+        LoadedItemsAction((b) => b..status = Status.idle().toBuilder());
 
     when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
       return Future.value([mockList.first]);
@@ -179,16 +176,20 @@ void main() {
 
     expect(
         store.onChange,
-        emitsInOrder(
-            [loadingState, loadingState, successState, successAddedState]));
+        emitsInOrder([
+          loadingState,
+          loadingState,
+          successState,
+          successAddedState,
+          emitsDone
+        ]));
   });
 
   test('should delete 1 item', () async {
     DeleteItemAction deleteItemAction =
         DeleteItemAction((b) => b.item = mockToDoItem.toBuilder());
-    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
-      ..items = ListBuilder([mockList.first])
-      ..status = Status.idle().toBuilder());
+    LoadedItemsAction loadedItemsAction =
+        LoadedItemsAction((b) => b..status = Status.idle().toBuilder());
 
     when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
       return Future.value([mockList.first]);
@@ -215,16 +216,17 @@ void main() {
               message: "${Label.todoDeleted} - ${mockToDoItem.title}")
           .toBuilder());
 
-    expect(store.onChange,
-        emitsInOrder([loadingState, loadingState, idleState, successState]));
+    expect(
+        store.onChange,
+        emitsInOrder(
+            [loadingState, loadingState, idleState, successState, emitsDone]));
   });
 
   test('should return error in api delete 1 item', () async {
     DeleteItemAction deleteItemAction =
         DeleteItemAction((b) => b.item = mockToDoItem.toBuilder());
-    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
-      ..items = ListBuilder([mockList.first])
-      ..status = Status.idle().toBuilder());
+    LoadedItemsAction loadedItemsAction =
+        LoadedItemsAction((b) => b..status = Status.idle().toBuilder());
 
     when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
       return Future.value([mockList.first]);
@@ -249,16 +251,17 @@ void main() {
       ..items = ListBuilder([mockList.first])
       ..status = Status.error(message: Label.errorDeletingToDo).toBuilder());
 
-    expect(store.onChange,
-        emitsInOrder([loadingState, loadingState, idleState, errorState]));
+    expect(
+        store.onChange,
+        emitsInOrder(
+            [loadingState, loadingState, idleState, errorState, emitsDone]));
   });
 
   test('should return exception delete 1 item', () async {
     DeleteItemAction deleteItemAction =
         DeleteItemAction((b) => b.item = mockToDoItem.toBuilder());
-    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
-      ..items = ListBuilder([mockList.first])
-      ..status = Status.idle().toBuilder());
+    LoadedItemsAction loadedItemsAction =
+        LoadedItemsAction((b) => b..status = Status.idle().toBuilder());
 
     when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
       return Future.value([mockList.first]);
@@ -285,9 +288,8 @@ void main() {
   });
 
   test('should update 1 item', () async {
-    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
-      ..items = ListBuilder([mockList.first])
-      ..status = Status.idle().toBuilder());
+    LoadedItemsAction loadedItemsAction =
+        LoadedItemsAction((b) => b..status = Status.idle().toBuilder());
     UpdateItemAction updateItemAction =
         UpdateItemAction((b) => b.item = updatedMockToDoItem.toBuilder());
 
@@ -321,9 +323,8 @@ void main() {
   });
 
   test('should return error updated 1 item', () async {
-    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
-      ..items = ListBuilder([mockList.first])
-      ..status = Status.idle().toBuilder());
+    LoadedItemsAction loadedItemsAction =
+        LoadedItemsAction((b) => b..status = Status.idle().toBuilder());
     UpdateItemAction updateItemAction =
         UpdateItemAction((b) => b.item = updatedMockToDoItem.toBuilder());
 
@@ -357,9 +358,8 @@ void main() {
   });
 
   test('should return exception updated 1 item', () async {
-    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
-      ..items = ListBuilder([mockList.first])
-      ..status = Status.idle().toBuilder());
+    LoadedItemsAction loadedItemsAction =
+        LoadedItemsAction((b) => b..status = Status.idle().toBuilder());
     UpdateItemAction updateItemAction =
         UpdateItemAction((b) => b.item = updatedMockToDoItem.toBuilder());
 

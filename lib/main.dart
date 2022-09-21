@@ -32,7 +32,8 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: StoreBuilder<AppState>(
-            onInit: (store) => store.dispatch(GetItemsAction()),
+            onInit: (store) => store.dispatch(LoadedItemsAction(
+                (b) => b..status = Status.idle().toBuilder())),
             builder: (context, store) {
               return MyHomePage(title: AppLocalizations.of(context)!.todoList);
             }),
