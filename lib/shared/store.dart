@@ -10,8 +10,6 @@ Store<AppState> initStore() {
   final compactMiddleware = ReduxCompact.createMiddleware<AppState>();
 
   RepoAction.repository = Repo();
-  // var epicMiddleware = AppMiddleware(todoRepo);
-  // final epics = combineEpics<AppState>([compactMiddleware]);
   final Store<AppState> store = Store<AppState>(compactReducer,
       initialState: AppState.init(), middleware: [compactMiddleware]);
   return store;

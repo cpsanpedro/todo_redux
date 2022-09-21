@@ -31,6 +31,7 @@ abstract class AddItemAction extends Object
   @override
   reduce() {
     print("REQ DATA ADD ${request.data}");
+    print("REQ loading ${request.loading}");
 
     if (request.loading) {
       return AppState((b) => b
@@ -48,10 +49,9 @@ abstract class AddItemAction extends Object
         ])
         ..status = Status.success(message: Label.todoAdded).toBuilder());
     } else {
-      return AppState((b) => b
-        ..items = store.state.items!.toBuilder()
+      return state.rebuild((p0) => p0
         ..status = Status.error(
-                message: request.error.message ?? Label.errorAddingToDo)
+                message: request.error?.message ?? Label.errorAddingToDo)
             .toBuilder());
     }
   }
@@ -92,10 +92,9 @@ abstract class DeleteItemAction extends Object
                 .toBuilder();
       });
     } else {
-      return AppState((b) => b
-        ..items = store.state.items!.toBuilder()
+      return state.rebuild((p0) => p0
         ..status = Status.error(
-                message: request.error.message ?? Label.errorDeletingToDo)
+                message: request.error?.message ?? Label.errorDeletingToDo)
             .toBuilder());
     }
   }
@@ -179,8 +178,6 @@ abstract class UpdateItemAction extends Object
 
   @override
   reduce() {
-    print("REQUEST DATA ${request.data}");
-
     if (request.loading) {
       return AppState((b) => b
         ..items = store.state.items!.toBuilder()
@@ -198,6 +195,7 @@ abstract class UpdateItemAction extends Object
           }
           return p0;
         });
+
         builder.items = list;
         builder.status = Status.success(message: Label.todoUpdated).toBuilder();
       });
@@ -205,7 +203,7 @@ abstract class UpdateItemAction extends Object
       return AppState((b) => b
         ..items = store.state.items!.toBuilder()
         ..status = Status.error(
-                message: request.error.message ?? Label.errorUpdatingToDo)
+                message: request.error?.message ?? Label.errorUpdatingToDo)
             .toBuilder());
     }
   }

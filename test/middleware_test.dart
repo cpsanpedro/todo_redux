@@ -1,14 +1,15 @@
+import 'dart:async';
+
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:redux/redux.dart';
-import 'package:redux_epics/redux_epics.dart';
+import 'package:redux_compact/redux_compact.dart';
 import 'package:todo_redux/constants/consts.dart';
 import 'package:todo_redux/model/model.dart';
 import 'package:todo_redux/model/status.dart';
 import 'package:todo_redux/redux/actions.dart';
-import 'package:todo_redux/redux/middleware.dart';
-import 'package:todo_redux/redux/reducers.dart';
+import 'package:todo_redux/redux/repo_action.dart';
 import 'package:todo_redux/repository/repo.dart';
 
 import 'mock_data.dart';
@@ -18,39 +19,15 @@ class MockRepo extends Mock implements AbstractRepo {}
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late MockRepo mockRepo;
-  late AppMiddleware appMiddleware;
-  Stream<dynamic> Function(Stream<dynamic>, EpicStore<AppState>) epics;
   late Store<AppState> store;
-  late LoadingAction isLoading;
-  late LoadingAction successLoadingOne;
-  late AddItemAction addItemAction;
-  late SuccessAddItemAction successAddOne;
-  late DeleteItemAction deleteItemAction;
-  late UpdateItemAction updateItemAction;
-
-  setUpAll(() {
-    isLoading = LoadingAction((b) => b.status = Status.loading().toBuilder());
-    successLoadingOne = LoadingAction((b) => b.status =
-        Status.success(message: "${Label.todoAdded} - ${mockToDoItem.title}")
-            .toBuilder());
-    addItemAction = AddItemAction((b) => b
-      ..id = mockToDoItem.id
-      ..title = mockToDoItem.title);
-    successAddOne = SuccessAddItemAction((b) => b.item
-      ..title = mockToDoItem.title
-      ..id = mockToDoItem.id);
-    deleteItemAction =
-        DeleteItemAction((b) => b.item = mockToDoItem.toBuilder());
-    updateItemAction =
-        UpdateItemAction((b) => b.item = updatedMockToDoItem.toBuilder());
-  });
 
   setUp(() {
-    mockRepo = MockRepo();
-    appMiddleware = AppMiddleware(mockRepo);
-    epics = combineEpics<AppState>([appMiddleware]);
-    store = Store<AppState>(appReducer,
-        initialState: AppState.init(), middleware: [EpicMiddleware(epics)]);
+    RepoAction.repository = MockRepo();
+    final compactReducer = ReduxCompact.createReducer<AppState>();
+    final compactMiddleware = ReduxCompact.createMiddleware<AppState>();
+
+    store = Store<AppState>(compactReducer,
+        initialState: AppState.init(), middleware: [compactMiddleware]);
   });
 
   test('should load init', () async {
@@ -58,16 +35,23 @@ void main() {
       ..items = ListBuilder([])
       ..status = Status.idle().toBuilder());
 
-    when(mockRepo.getTodos()).thenAnswer((realInvocation) {
+    when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
       return Future.value([]);
     });
 
-    Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([GetItemsAction()]).asBroadcastStream(),
-      EpicStore(store),
-    );
+    scheduleMicrotask(() {
+      store.dispatch(emptyLoaded);
+      Future.delayed(Duration.zero, store.teardown);
+    });
 
-    expect(await stream.toList(), [emptyLoaded]);
+    final loadingState =
+        store.state.rebuild((p0) => p0..status = Status.loading().toBuilder());
+    final successState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([])
+      ..status = Status.idle().toBuilder());
+
+    expect(
+        store.onChange, emitsInOrder([loadingState, successState, emitsDone]));
   });
 
   test('should load 1 item', () async {
@@ -75,200 +59,331 @@ void main() {
       ..items = ListBuilder([mockList.first])
       ..status = Status.idle().toBuilder());
 
-    when(mockRepo.getTodos()).thenAnswer((realInvocation) {
+    when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
       return Future.value([mockList.first]);
     });
 
-    Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([GetItemsAction()]).asBroadcastStream(),
-      EpicStore(store),
-    );
+    scheduleMicrotask(() {
+      store.dispatch(loadedItemsAction);
+      Future.delayed(Duration.zero, store.teardown);
+    });
 
-    expect(await stream.toList(), [loadedItemsAction]);
+    final loadingState =
+        store.state.rebuild((p0) => p0..status = Status.loading().toBuilder());
+    final successState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
+
+    expect(
+        store.onChange, emitsInOrder([loadingState, successState, emitsDone]));
   });
 
   test('should add item', () async {
-    when(mockRepo.saveTodos(mockToDoItem)).thenAnswer((realInvocation) {
+    AddItemAction addItemAction = AddItemAction((b) => b
+      ..id = mockToDoItem.id
+      ..title = mockToDoItem.title);
+
+    when(RepoAction.repository.saveTodos(mockToDoItem))
+        .thenAnswer((realInvocation) {
       return Future.value(true);
     });
 
-    Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([addItemAction]).asBroadcastStream(),
-      EpicStore(store),
-    );
+    scheduleMicrotask(() {
+      store.dispatch(addItemAction);
+      Future.delayed(Duration.zero, store.teardown);
+    });
 
-    expect(await stream.toList(), [
-      isLoading,
-      successAddOne,
-      successLoadingOne,
-    ]);
+    final loadingState =
+        store.state.rebuild((p0) => p0..status = Status.loading().toBuilder());
+    final successState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.success(message: Label.todoAdded).toBuilder());
+
+    expect(
+        store.onChange, emitsInOrder([loadingState, successState, emitsDone]));
   });
 
   test('should return error add item', () async {
-    LoadingAction errorLoading = LoadingAction((b) =>
-        b.status = Status.error(message: Label.errorAddingToDo).toBuilder());
+    AddItemAction addItemAction = AddItemAction((b) => b
+      ..id = mockToDoItem.id
+      ..title = mockToDoItem.title);
 
-    when(mockRepo.saveTodos(mockToDoItem)).thenAnswer((realInvocation) {
+    when(RepoAction.repository.saveTodos(mockToDoItem))
+        .thenAnswer((realInvocation) {
       return Future.value(false);
     });
 
-    Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([addItemAction]).asBroadcastStream(),
-      EpicStore(store),
-    );
+    scheduleMicrotask(() {
+      store.dispatch(addItemAction);
+      Future.delayed(Duration.zero, store.teardown);
+    });
 
-    expect(await stream.toList(), [
-      isLoading,
-      errorLoading,
-    ]);
+    final loadingState =
+        store.state.rebuild((p0) => p0..status = Status.loading().toBuilder());
+    final errorState = store.state.rebuild((p0) =>
+        p0..status = Status.error(message: Label.errorAddingToDo).toBuilder());
+
+    expect(store.onChange, emitsInOrder([loadingState, errorState, emitsDone]));
   });
 
   test('should return exception add item', () async {
-    LoadingAction errorLoading = LoadingAction(
-        (b) => b.status = Status.error(message: "Add Failed").toBuilder());
+    AddItemAction addItemAction = AddItemAction((b) => b
+      ..id = mockToDoItem.id
+      ..title = mockToDoItem.title);
 
-    when(mockRepo.saveTodos(mockToDoItem)).thenThrow("Add Failed");
+    when(RepoAction.repository.saveTodos(mockToDoItem))
+        .thenThrow(Exception("Add Failed"));
 
-    Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([addItemAction]).asBroadcastStream(),
-      EpicStore(store),
-    );
+    scheduleMicrotask(() {
+      store.dispatch(addItemAction);
+      Future.delayed(Duration.zero, store.teardown);
+    });
 
-    expect(await stream.toList(), [
-      isLoading,
-      errorLoading,
-    ]);
+    final errorState = store.state.rebuild(
+        (p0) => p0..status = Status.error(message: "Add Failed").toBuilder());
+
+    expect(store.onChange, emitsInOrder([errorState, emitsDone]));
   });
 
   test('should add another item', () async {
+    AddItemAction addItemAction = AddItemAction((b) => b
+      ..id = mockToDoItem.id
+      ..title = mockToDoItem.title);
     AddItemAction addAnotherItemAction = AddItemAction((b) => b
       ..id = anotherMockToDoItem.id
       ..title = anotherMockToDoItem.title);
-    LoadingAction successLoadingTwo = LoadingAction((b) => b.status =
-        Status.success(
-                message: "${Label.todoAdded} - ${anotherMockToDoItem.title}")
-            .toBuilder());
-    SuccessAddItemAction successAddTwo = SuccessAddItemAction((b) => b.item
-      ..title = anotherMockToDoItem.title
-      ..id = anotherMockToDoItem.id);
 
-    when(mockRepo.saveTodos(mockToDoItem)).thenAnswer((realInvocation) {
+    when(RepoAction.repository.saveTodos(mockToDoItem))
+        .thenAnswer((realInvocation) {
       return Future.value(true);
     });
-    when(mockRepo.saveTodos(anotherMockToDoItem)).thenAnswer((realInvocation) {
+    when(RepoAction.repository.saveTodos(anotherMockToDoItem))
+        .thenAnswer((realInvocation) {
       return Future.value(true);
     });
 
-    Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([addItemAction, addAnotherItemAction])
-          .asBroadcastStream(),
-      EpicStore(store),
-    );
+    scheduleMicrotask(() {
+      store.dispatch(addItemAction);
+      store.dispatch(addAnotherItemAction);
+      Future.delayed(Duration.zero, store.teardown);
+    });
 
-    expect(await stream.toList(), [
-      isLoading,
-      successAddOne,
-      successLoadingOne,
-      isLoading,
-      successAddTwo,
-      successLoadingTwo
-    ]);
+    final loadingState =
+        store.state.rebuild((p0) => p0..status = Status.loading().toBuilder());
+    final successState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.success(message: Label.todoAdded).toBuilder());
+    final successAddedState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder(mockList)
+      ..status = Status.success(message: Label.todoAdded).toBuilder());
+
+    expect(
+        store.onChange,
+        emitsInOrder(
+            [loadingState, loadingState, successState, successAddedState]));
   });
 
   test('should delete 1 item', () async {
-    LoadingAction successLoading = LoadingAction((b) => b.status =
-        Status.success(message: "${Label.todoDeleted} - ${mockToDoItem.title}")
-            .toBuilder());
-    SuccessDeleteItemAction successDelete =
-        SuccessDeleteItemAction((b) => b.item = mockToDoItem.toBuilder());
+    DeleteItemAction deleteItemAction =
+        DeleteItemAction((b) => b.item = mockToDoItem.toBuilder());
+    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
 
-    when(mockRepo.deleteTodo(mockToDoItem)).thenAnswer((realInvocation) {
+    when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
+      return Future.value([mockList.first]);
+    });
+    when(RepoAction.repository.deleteTodo(mockToDoItem))
+        .thenAnswer((realInvocation) {
       return Future.value(true);
     });
 
-    Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([deleteItemAction]).asBroadcastStream(),
-      EpicStore(store),
-    );
+    scheduleMicrotask(() {
+      store.dispatch(loadedItemsAction);
+      store.dispatch(deleteItemAction);
+      Future.delayed(Duration.zero, store.teardown);
+    });
 
-    expect(await stream.toList(), [isLoading, successDelete, successLoading]);
+    final loadingState =
+        store.state.rebuild((p0) => p0..status = Status.loading().toBuilder());
+    final idleState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
+    final successState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([])
+      ..status = Status.success(
+              message: "${Label.todoDeleted} - ${mockToDoItem.title}")
+          .toBuilder());
+
+    expect(store.onChange,
+        emitsInOrder([loadingState, loadingState, idleState, successState]));
   });
 
   test('should return error in api delete 1 item', () async {
-    LoadingAction errorLoading = LoadingAction((b) =>
-        b.status = Status.error(message: Label.errorDeletingToDo).toBuilder());
+    DeleteItemAction deleteItemAction =
+        DeleteItemAction((b) => b.item = mockToDoItem.toBuilder());
+    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
 
-    when(mockRepo.deleteTodo(mockToDoItem)).thenAnswer((realInvocation) {
+    when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
+      return Future.value([mockList.first]);
+    });
+    when(RepoAction.repository.deleteTodo(mockToDoItem))
+        .thenAnswer((realInvocation) {
       return Future.value(false);
     });
 
-    Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([deleteItemAction]).asBroadcastStream(),
-      EpicStore(store),
-    );
+    scheduleMicrotask(() {
+      store.dispatch(loadedItemsAction);
+      store.dispatch(deleteItemAction);
+      Future.delayed(Duration.zero, store.teardown);
+    });
 
-    expect(await stream.toList(), [isLoading, errorLoading]);
+    final loadingState =
+        store.state.rebuild((p0) => p0..status = Status.loading().toBuilder());
+    final idleState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
+    final errorState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.error(message: Label.errorDeletingToDo).toBuilder());
+
+    expect(store.onChange,
+        emitsInOrder([loadingState, loadingState, idleState, errorState]));
   });
 
   test('should return exception delete 1 item', () async {
-    LoadingAction errorLoading = LoadingAction(
-        (b) => b.status = Status.error(message: "Delete failed").toBuilder());
+    DeleteItemAction deleteItemAction =
+        DeleteItemAction((b) => b.item = mockToDoItem.toBuilder());
+    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
 
-    when(mockRepo.deleteTodo(mockToDoItem)).thenThrow("Delete failed");
+    when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
+      return Future.value([mockList.first]);
+    });
+    when(RepoAction.repository.deleteTodo(mockToDoItem))
+        .thenThrow(Exception("Delete failed"));
 
-    Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([deleteItemAction]).asBroadcastStream(),
-      EpicStore(store),
-    );
+    scheduleMicrotask(() {
+      store.dispatch(loadedItemsAction);
+      store.dispatch(deleteItemAction);
+      Future.delayed(Duration.zero, store.teardown);
+    });
 
-    expect(await stream.toList(), [isLoading, errorLoading]);
+    final loadingState =
+        store.state.rebuild((p0) => p0..status = Status.loading().toBuilder());
+    final idleState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
+    final errorState = store.state.rebuild((p0) =>
+        p0..status = Status.error(message: "Delete failed").toBuilder());
+
+    expect(store.onChange,
+        emitsInOrder([loadingState, errorState, idleState, emitsDone]));
   });
 
   test('should update 1 item', () async {
-    LoadingAction successLoading = LoadingAction((b) =>
-        b.status = Status.success(message: "${Label.todoUpdated}").toBuilder());
-    SuccessUpdateItemAction successUpdated = SuccessUpdateItemAction(
-        (b) => b.item = updatedMockToDoItem.toBuilder());
+    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
+    UpdateItemAction updateItemAction =
+        UpdateItemAction((b) => b.item = updatedMockToDoItem.toBuilder());
 
-    when(mockRepo.updateTodo(updatedMockToDoItem)).thenAnswer((realInvocation) {
+    when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
+      return Future.value([mockList.first]);
+    });
+    when(RepoAction.repository.updateTodo(updatedMockToDoItem))
+        .thenAnswer((realInvocation) {
       return Future.value(true);
     });
 
-    Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([updateItemAction]).asBroadcastStream(),
-      EpicStore(store),
-    );
+    scheduleMicrotask(() {
+      store.dispatch(loadedItemsAction);
+      store.dispatch(updateItemAction);
+      Future.delayed(Duration.zero, store.teardown);
+    });
 
-    expect(await stream.toList(), [isLoading, successUpdated, successLoading]);
+    final loadingState =
+        store.state.rebuild((p0) => p0..status = Status.loading().toBuilder());
+    final idleState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
+    final successState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([updatedMockToDoItem])
+      ..status = Status.success(message: Label.todoUpdated).toBuilder());
+
+    expect(
+        store.onChange,
+        emitsInOrder(
+            [loadingState, loadingState, idleState, successState, emitsDone]));
   });
 
   test('should return error updated 1 item', () async {
-    LoadingAction errorLoading = LoadingAction((b) => b.status =
-        Status.error(message: "${Label.errorUpdatingToDo}").toBuilder());
+    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
+    UpdateItemAction updateItemAction =
+        UpdateItemAction((b) => b.item = updatedMockToDoItem.toBuilder());
 
-    when(mockRepo.updateTodo(updatedMockToDoItem)).thenAnswer((realInvocation) {
+    when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
+      return Future.value([mockList.first]);
+    });
+    when(RepoAction.repository.updateTodo(updatedMockToDoItem))
+        .thenAnswer((realInvocation) {
       return Future.value(false);
     });
 
-    Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([updateItemAction]).asBroadcastStream(),
-      EpicStore(store),
-    );
+    scheduleMicrotask(() {
+      store.dispatch(loadedItemsAction);
+      store.dispatch(updateItemAction);
+      Future.delayed(Duration.zero, store.teardown);
+    });
 
-    expect(await stream.toList(), [isLoading, errorLoading]);
+    final loadingState =
+        store.state.rebuild((p0) => p0..status = Status.loading().toBuilder());
+    final idleState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
+    final errorState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([mockToDoItem])
+      ..status = Status.error(message: Label.errorUpdatingToDo).toBuilder());
+
+    expect(
+        store.onChange,
+        emitsInOrder(
+            [loadingState, loadingState, idleState, errorState, emitsDone]));
   });
 
   test('should return exception updated 1 item', () async {
-    LoadingAction errorLoading = LoadingAction(
-        (b) => b.status = Status.error(message: "Update Failed").toBuilder());
+    LoadedItemsAction loadedItemsAction = LoadedItemsAction((b) => b
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
+    UpdateItemAction updateItemAction =
+        UpdateItemAction((b) => b.item = updatedMockToDoItem.toBuilder());
 
-    when(mockRepo.updateTodo(updatedMockToDoItem)).thenThrow("Update Failed");
+    when(RepoAction.repository.getTodos()).thenAnswer((realInvocation) {
+      return Future.value([mockList.first]);
+    });
+    when(RepoAction.repository.updateTodo(updatedMockToDoItem))
+        .thenThrow(Exception("Update failed"));
 
-    Stream<dynamic> stream = appMiddleware.call(
-      Stream.fromIterable([updateItemAction]).asBroadcastStream(),
-      EpicStore(store),
-    );
+    scheduleMicrotask(() {
+      store.dispatch(loadedItemsAction);
+      store.dispatch(updateItemAction);
+      Future.delayed(Duration.zero, store.teardown);
+    });
 
-    expect(await stream.toList(), [isLoading, errorLoading]);
+    final loadingState =
+        store.state.rebuild((p0) => p0..status = Status.loading().toBuilder());
+    final idleState = store.state.rebuild((p0) => p0
+      ..items = ListBuilder([mockList.first])
+      ..status = Status.idle().toBuilder());
+    final errorState = store.state.rebuild((p0) =>
+        p0..status = Status.error(message: "Update failed").toBuilder());
+
+    expect(store.onChange,
+        emitsInOrder([loadingState, errorState, idleState, emitsDone]));
   });
 }

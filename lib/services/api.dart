@@ -46,7 +46,6 @@ class Api {
   static Future<bool> saveTodos(ToDoItem item) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-
       List<dynamic> todos = await getList();
 
       List<ToDoItem> parsedTodos = [];
